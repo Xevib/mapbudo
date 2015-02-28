@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Mapbudo</string>
+    <string name="action_settings">Configuraciones</string>
+    <string name="title_activity_values">ValuesActivity</string>
+    <string name="name">Nombre</string>
+    <string name="adress">Address\nInformation</string>
+    <string name="web">Web</string>
+    <string name="phone">Telefono</string>
+    <string name="opening_hours">Horario de apertura</string>
+    <string name="description">Descripcion</string>
+    <string name="save">Guardar</string>
+    <string name="my_location">Mi localizacion</string>
+    <string name="options_open">Options</string>
+    <string name="options_close">mapper</string>
+    <string name="gps_disabled">El GPS esta desactivado,porfavor activalo</string>
+    <string name="delete_item">Eliminar punto</string>
+    <string name="username">Nombre de usuario</string>
+    <string name="password">Contraseña</string>
+    <string name="login">Identificar</string>
+    <string name="invalid_user">No se ha podido identificar, porfavor comprueba tu usuario y contraseña</string>
+    <string name="invalid_user_etxt">Nombre de usuario incorrecto</string>
+    <string name="invalid_password_etxt">Contraseña incorrecta</string>
+    <string name="password_not_set">La contraseña no esta asignada o no es correcta.No podras editar OpenStreetMap</string>
+    <string name="about">Acerca de</string>
+    <string name="title_activity_settings">Configuracion</string>
+	<string name="exit">Salir</string>
+	<string name="save_password">Guardar contraseña</string>
+	<string name="settings">Configuracion</string>
+	<string name="map">map</string>
+	<string name="about_message">Esta aplicacion usa datos de los colaboradores de OpenStreeetMap bajo la licencia ODBL</string>
+</resources>

@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.maper.MainActivity" >
+
+	<item 
+	    android:id="@+id/action_locate"
+	    android:title="@string/my_location"
+	    app:showAsAction="always"
+		android:orderInCategory="100"
+		android:icon="@drawable/ic_action_location_found"
+	    />
+	<item 
+	    android:id="@+id/action_settings"
+	    android:title="@string/settings"
+	    app:showAsAction="always"
+		android:orderInCategory="100"
+		android:icon="@drawable/ic_action_settings"
+	    />
+		
+</menu>
+<!-- From: file:/home/xevi/studio_workspace/Mapbudo/app/src/main/res/menu/main.xml -->

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From: file:/home/xevi/studio_workspace/Mapbudo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/res/values-es/values.xml -->
+    <eat-comment/>
+    <string msgid="4600421777120114993" name="abc_action_bar_home_description">"Ir a la pantalla de inicio"</string>
+    <string msgid="1397052879051804371" name="abc_action_bar_home_description_format">"%1$s, %2$s"</string>
+    <string msgid="6623331958280229229" name="abc_action_bar_home_subtitle_description_format">"%1$s, %2$s, %3$s"</string>
+    <string msgid="1594238315039666878" name="abc_action_bar_up_description">"Desplazarse hacia arriba"</string>
+    <string msgid="3588849162933574182" name="abc_action_menu_overflow_description">"Más opciones"</string>
+    <string msgid="4076576682505996667" name="abc_action_mode_done">"Listo"</string>
+    <string msgid="7468859129482906941" name="abc_activity_chooser_view_see_all">"Ver todo"</string>
+    <string msgid="2031811694353399454" name="abc_activitychooserview_choose_application">"Seleccionar una aplicación"</string>
+    <string msgid="3691816814315814921" name="abc_searchview_description_clear">"Borrar consulta"</string>
+    <string msgid="2550479030709304392" name="abc_searchview_description_query">"Consulta"</string>
+    <string msgid="8264924765203268293" name="abc_searchview_description_search">"Buscar"</string>
+    <string msgid="8928215447528550784" name="abc_searchview_description_submit">"Enviar consulta"</string>
+    <string msgid="893419373245838918" name="abc_searchview_description_voice">"Búsqueda por voz"</string>
+    <string msgid="3421042268587513524" name="abc_shareactionprovider_share_with">"Compartir con"</string>
+    <string msgid="7165123711973476752" name="abc_shareactionprovider_share_with_application">"Compartir con %s"</string>
+    <!-- From: file:/home/xevi/studio_workspace/Mapbudo/app/src/main/res/values-es/strings.xml -->
+    <eat-comment/>
+    <string name="about">Acerca de</string>
+    <string name="about_message">Esta aplicacion usa datos de los colaboradores de OpenStreeetMap bajo la licencia ODBL</string>
+    <string name="action_settings">Configuraciones</string>
+    <string name="adress">Address\nInformation</string>
+    <string name="app_name">Mapbudo</string>
+    <string name="delete_item">Eliminar punto</string>
+    <string name="description">Descripcion</string>
+    <string name="exit">Salir</string>
+    <string name="gps_disabled">El GPS esta desactivado,porfavor activalo</string>
+    <string name="invalid_password_etxt">Contraseña incorrecta</string>
+    <string name="invalid_user">No se ha podido identificar, porfavor comprueba tu usuario y contraseña</string>
+    <string name="invalid_user_etxt">Nombre de usuario incorrecto</string>
+    <string name="login">Identificar</string>
+    <string name="map">map</string>
+    <string name="my_location">Mi localizacion</string>
+    <string name="name">Nombre</string>
+    <string name="opening_hours">Horario de apertura</string>
+    <string name="options_close">mapper</string>
+    <string name="options_open">Options</string>
+    <string name="password">Contraseña</string>
+    <string name="password_not_set">La contraseña no esta asignada o no es correcta.No podras editar OpenStreetMap</string>
+    <string name="phone">Telefono</string>
+    <string name="save">Guardar</string>
+    <string name="save_password">Guardar contraseña</string>
+    <string name="settings">Configuracion</string>
+    <string name="title_activity_settings">Configuracion</string>
+    <string name="title_activity_values">ValuesActivity</string>
+    <string name="username">Nombre de usuario</string>
+    <string name="web">Web</string>
+</resources>

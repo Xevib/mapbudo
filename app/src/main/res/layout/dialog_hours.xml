@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/txtHours"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_days">
+
+        <ToggleButton
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="Dll"
+            android:id="@+id/btMonday"
+            android:textOn="Dll"
+            android:textOff="Dll" />
+
+        <ToggleButton
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="Dm"
+            android:id="@+id/btTuesday"
+            android:textOff="Dm"
+            android:textOn="Dm" />
+
+        <ToggleButton
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="Dmc"
+            android:id="@+id/btWednesday"
+            android:textOff="Dmc"
+            android:textOn="Dmc" />
+
+        <ToggleButton
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="Dj"
+            android:id="@+id/btThursday"
+            android:textOff="Dj"
+            android:textOn="Dv" />
+
+        <ToggleButton
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="Dv"
+            android:id="@+id/btFriday"
+            android:textOff="Dv"
+            android:textOn="Dv" />
+
+        <ToggleButton
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="Ds"
+            android:id="@+id/btSaturday"
+            android:textOff="Ds"
+            android:textOn="Ds" />
+
+        <ToggleButton
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="Dg"
+            android:id="@+id/btSunday"
+            android:textOff="Dg"
+            android:textOn="Dg" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_days"
+        android:id="@+id/linearLayout">
+
+        <com.edmodo.rangebar.RangeBar
+            xmlns:custom="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/slRange"
+            android:layout_width="299dp"
+            android:layout_height="wrap_content"
+            custom:tickCount="14440"
+            android:layout_gravity="left" />
+
+        <Button
+            android:layout_width="51dp"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:id="@+id/addOpen" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <Button
+            android:id="@+id/dialogButtonOK"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" Ok "
+            android:layout_below="@+id/slRange" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reset"
+            android:id="@+id/reset" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="24/7"
+            android:id="@+id/all" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Raw Edit"
+            android:id="@+id/button"
+            android:layout_below="@+id/slRange"
+            android:layout_alignRight="@+id/txtHours"
+            android:layout_alignEnd="@+id/txtHours" />
+
+    </LinearLayout>
+
+</LinearLayout>
