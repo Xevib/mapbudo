@@ -30,5 +30,6 @@
 	<string name="map">map</string>
 	<string name="about_message">Esta aplicacion usa datos de los colaboradores de OpenStreeetMap bajo la licencia ODBL</string>
     <string name="osmusername">Usuario de OpenStreetMap</string>
-    <string name="osmupassword">Contraseña de OpenStreetMap</string>
+    <string name="osmpassword">Contraseña de OpenStreetMap</string>
+    <string name="loginMessage">Mapbuo nessecita el usuario y contrasenñ de OpenStreetMap para poder editar</string>
 </resources>

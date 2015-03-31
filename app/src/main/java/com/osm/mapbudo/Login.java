@@ -35,14 +35,10 @@ public class Login extends FragmentActivity {
 		}
 		else
 		{
-			
 			if (savedInstanceState == null) {
 				getSupportFragmentManager().beginTransaction().add(R.id.container, new PlaceholderFragment()).commit();
 			}
-			else
-			{
-				
-			}
+
 		}
 	}
 
@@ -87,36 +83,36 @@ public class Login extends FragmentActivity {
 			{
 				etUsername.setText(preferences.getString("user", ""));
 			}
+
+
+            Toast.makeText(getActivity(),rootView.getContext().getString(R.string.loginMessage), Toast.LENGTH_LONG).show();
 			
 			btLogin.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					
-					OSMAPI api=new OSMAPI(v.getContext());
-					etUsername=(EditText)getActivity().findViewById(R.id.etUsername);
-					etPassword=(EditText)getActivity().findViewById(R.id.etPassword);
-					
-					
-					Boolean valid=api.getUserDetails(etUsername.getText().toString(), etPassword.getText().toString());
-					
-					if (valid)
-					{
-						SharedPreferences preferences =  getActivity().getSharedPreferences("com.osm.budomap", Context.MODE_PRIVATE);
-						preferences.edit().putBoolean("valid_user", true).commit();
-						preferences.edit().putString("user",etUsername.getText().toString()).commit();
-						preferences.edit().putString("password",etPassword.getText().toString()).commit();
-						Intent i=new Intent(getActivity(), MainActivity.class);
-						startActivity(i);
-					}
-					else
-					{
-						etUsername.setError(getActivity().getResources().getString( R.string.invalid_user_etxt));
-						etPassword.setError(getActivity().getResources().getString(R.string.invalid_password_etxt));
-						Toast.makeText(getActivity().getApplicationContext(), getActivity().getResources().getString(R.string.invalid_user), Toast.LENGTH_LONG).show();
-					}
-				}
-			});
+
+                @Override
+                public void onClick(View v) {
+
+                    OSMAPI api = new OSMAPI(v.getContext());
+                    etUsername = (EditText) getActivity().findViewById(R.id.etUsername);
+                    etPassword = (EditText) getActivity().findViewById(R.id.etPassword);
+
+
+                    Boolean valid = api.getUserDetails(etUsername.getText().toString(), etPassword.getText().toString());
+
+                    if (valid) {
+                        SharedPreferences preferences = getActivity().getSharedPreferences("com.osm.budomap", Context.MODE_PRIVATE);
+                        preferences.edit().putBoolean("valid_user", true).commit();
+                        preferences.edit().putString("user", etUsername.getText().toString()).commit();
+                        preferences.edit().putString("password", etPassword.getText().toString()).commit();
+                        Intent i = new Intent(getActivity(), MainActivity.class);
+                        startActivity(i);
+                    } else {
+                        etUsername.setError(getActivity().getResources().getString(R.string.invalid_user_etxt));
+                        etPassword.setError(getActivity().getResources().getString(R.string.invalid_password_etxt));
+                        Toast.makeText(getActivity().getApplicationContext(), getActivity().getResources().getString(R.string.invalid_user), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
 			return rootView;
 		}
 	}
