@@ -732,7 +732,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 			if( p.getType().getIcon()==null)
 			{
 				
-				m.setIcon(this.getResources().getDrawable(R.drawable.ic_launcher));
+				m.setIcon(this.getResources().getDrawable(R.drawable.logo));
 			}
 			else
 			{
