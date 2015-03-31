@@ -35,7 +35,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="92dp"
         android:ems="10"
-        android:hint="@string/username" 
+        android:hint="@string/osmusername"
         >
         <requestFocus />
         </EditText>
@@ -47,7 +47,7 @@
         android:layout_below="@+id/etUsername"
         android:layout_centerHorizontal="true"
         android:ems="10"
-        android:hint="@string/password"
+        android:hint="@string/osmpassword"
         android:inputType="textPassword" >
         
     </EditText>

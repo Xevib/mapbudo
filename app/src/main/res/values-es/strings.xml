@@ -29,4 +29,6 @@
 	<string name="settings">Configuracion</string>
 	<string name="map">map</string>
 	<string name="about_message">Esta aplicacion usa datos de los colaboradores de OpenStreeetMap bajo la licencia ODBL</string>
+    <string name="osmusername">Usuario de OpenStreetMap</string>
+    <string name="osmupassword">Contraseña de OpenStreetMap</string>
 </resources>

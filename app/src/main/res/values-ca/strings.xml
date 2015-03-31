@@ -30,4 +30,6 @@
 	<string name="settings">Configuració</string>
 	<string name="map">map</string>
 	<string name="about_message">Aquesta aplicacio usa dades dels col·laboradros de l\'OpenStreetMap sota llicència ODBL</string>
+    <string name="osmusername">Usuari d\'OpenStreetMap</string>
+    <string name="osmupassword">Contrasenya d\'OpenStreetMap</string>
 </resources>
