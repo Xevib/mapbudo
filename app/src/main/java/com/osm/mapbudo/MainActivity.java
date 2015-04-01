@@ -516,7 +516,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 			GeoPoint gpoint=new GeoPoint(lat,lon,0);
 			MapView map=(MapView)this.findViewById(R.id.mapview);
 			map.getController().setCenter(gpoint);
-			//map.getController().setZoom(this.getLastZoom());
+			map.getController().setZoom(17);
 			map.invalidate();
 		}
 	}
@@ -708,7 +708,16 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		this.lastlon=lon;
 		
 	}
-
+    protected  void clearPOIs()
+    {
+        MapView map=((MapView)this.findViewById(R.id.mapview));
+        //Iterar per majors de 1 i eliminar-los
+        while(map.getOverlays().size()>1){
+            map.getOverlays().remove(1);
+        }
+        map.getOverlays();
+        map.invalidate();
+    }
 	protected void addPOI(POI p)
 	{
 		final Context context=this;
@@ -1107,18 +1116,17 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		this.newPOI_type=filt.getType(groupName, second);
 	}
 	public void changeFilter(String groupName, Integer second, boolean checked) {
-		
 		POIType t=filt.getType(groupName, second);
 		
-		if (checked)
-		{
+		if (checked){
 			filt.enableType(t);
 
+		} else {
+			filt.disableType(t);
+            this.clearPOIs();
+            this.refreshPOIs();
 		}
-		else
-		{
-			filt.disableType(t);			
-		}
+
 	}
 	public List<POIType> getAvaibleTypes()
 	{
