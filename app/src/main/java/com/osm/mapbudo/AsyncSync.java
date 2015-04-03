@@ -70,7 +70,7 @@ public class AsyncSync extends AsyncTask< HashMap<String,List<POI>>,Object,Pair<
 			HttpClient httpclient = new DefaultHttpClient();
 			String url_create="http://api.openstreetmap.org/api/0.6/changeset/create";
 			HttpPut request_create=new HttpPut(url_create);
-			StringEntity entity=new StringEntity("<osm><changeset><tag k=\"created_by\" v=\"Mapbudo\"/><tag k=\"comment\" v=\"api testing\"/></changeset></osm>");
+			StringEntity entity=new StringEntity("<osm><changeset><tag k=\"created_by\" v=\"Mapbudo\"/><tag k=\"comment\" v=\"add POI\"/></changeset></osm>");
 
 			entity.setContentType("text/xml");
 			request_create.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials(this.username,this.password),"UTF-8", false));
