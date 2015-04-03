@@ -1174,8 +1174,9 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		Marker tmp;
 		for (POI p:outdated_pois)
 		{
-			if( p.getStatus()=="created")
+			if( p.getStatus().equalsIgnoreCase("created"))
 			{
+
 				x=1;
 				while (x<overlay_list.size() &&(Long.valueOf(((Marker)overlay_list.get(x)).getTitle())!=(-1*p.getId())))
 				{

@@ -128,33 +128,22 @@ public class AsyncSync extends AsyncTask< HashMap<String,List<POI>>,Object,Pair<
 	 			String xml_response=EntityUtils.toString(response_upload.getEntity(),HTTP.UTF_8);
 	 			Log.v("response", xml_response);
 	 			if (response_upload.getStatusLine().getStatusCode()==200)
+                {
                     if (xml_response == "Element node/ has duplicate tags with key amenity") {
                         Log.e("wrong data", xml_response);
                         return new Pair<Integer, Integer>(1, changesetId);
+                    }else if(xml_response.startsWith("Version mismatch: Provided")){
+                        Log.v("Error","version error");
                     } else {
-                        //Log.v("app","Upload->"+changesetId+" response->"+xml_response);
-                        //Log.v("app","XM->"+xml);
-
-
                         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                         DocumentBuilder builder;
                         builder = factory.newDocumentBuilder();
-
                         Document document = builder.parse(new InputSource(new StringReader(xml_response)));
-
-                        //HashMap<Long,Long> convert_id_osmId=new HashMap<Long,Long>();
-                        //Long old_id,new_id;
-
-                        //DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
                         XPathFactory xPathfactory = XPathFactory.newInstance();
                         XPath xpath = xPathfactory.newXPath();
                         XPathExpression expr_old = xpath.compile("/diffResult/node[@new_id  and @old_id]");
                         NodeList n_old = (NodeList) expr_old.evaluate(document, XPathConstants.NODESET);
                         this.id_conversion = new ArrayList<Pair<Long, Long>>();
-
-                        //((MainActivity)this.m).updateIds();
-
                         this.points = new ArrayList<POI>();
                         this.points.addAll(outdated_pois.get("created"));
                         this.points.addAll(outdated_pois.get("modified"));
@@ -164,15 +153,16 @@ public class AsyncSync extends AsyncTask< HashMap<String,List<POI>>,Object,Pair<
                         for (int x = 0; x < n_old.getLength(); x++) {
                             id_conversion.add(new Pair<Long, Long>(Long.valueOf(n_old.item(x).getAttributes().getNamedItem("old_id").getNodeValue()), Long.valueOf(n_old.item(x).getAttributes().getNamedItem("new_id").getNodeValue())));
                             y = 0;
-                            while (y < points.size() && ( (-1*points.get(y).getId() )!= Long.valueOf(n_old.item(x).getAttributes().getNamedItem("old_id").getNodeValue()))) {
-                                y++;
+                            if (points.get(x).getId()!=null) {
+                                while (y < points.size() && ((-1 * points.get(y).getId()) != Long.valueOf(n_old.item(x).getAttributes().getNamedItem("old_id").getNodeValue()))) {
+                                    y++;
+                                }
+                                if ((-1 * points.get(y).getId()) == Long.valueOf(n_old.item(x).getAttributes().getNamedItem("old_id").getNodeValue())) {
+                                    tmp = points.get(y);
+                                    tmp.setOsmId(Long.valueOf(n_old.item(x).getAttributes().getNamedItem("new_id").getNodeValue()));
+                                    points.set(y, tmp);
+                                }
                             }
-                            if ((-1*points.get(y).getId()) == Long.valueOf( n_old.item(x).getAttributes().getNamedItem("old_id").getNodeValue())) {
-                                tmp = points.get(y);
-                                tmp.setOsmId(Long.valueOf(n_old.item(x).getAttributes().getNamedItem("new_id").getNodeValue()));
-                                points.set(y, tmp);
-                            }
-
                         }
 
                         //Close changeset
@@ -187,11 +177,7 @@ public class AsyncSync extends AsyncTask< HashMap<String,List<POI>>,Object,Pair<
                         HttpResponse response_close = httpclient.execute(request_close);
                         HttpEntity entity_close = response_close.getEntity();
                         String responseString = EntityUtils.toString(entity_close, "UTF-8");
-                        Log.v( "response_close", responseString);
-
-
-
-
+                        Log.v("response_close", responseString);
 
                         if (response_close.getStatusLine().getStatusCode() == 200) {
                             return new Pair<Integer, Integer>(3, changesetId);
@@ -201,6 +187,7 @@ public class AsyncSync extends AsyncTask< HashMap<String,List<POI>>,Object,Pair<
 
                         }
                     }
+                }
 	 			else
 	 			{
 	 				return new Pair<Integer,Integer>(1,changesetId);
