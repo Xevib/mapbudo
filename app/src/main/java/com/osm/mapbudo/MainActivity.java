@@ -9,7 +9,6 @@ package com.osm.mapbudo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import android.content.BroadcastReceiver;
 
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
@@ -26,10 +25,8 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
-import android.app.Dialog;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -57,11 +54,8 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-import android.content.DialogInterface;
 
 public class MainActivity extends ActionBarActivity implements MapEventsReceiver,OnMarkerDragListener {
-
-	//private ItemizedIconOverlay<OverlayItem> layerPOIs;
 	private DrawerLayout drawerlayout;
 	private ActionBarDrawerToggle drawertoggle;
 	private ExpandableListView drawerlist;
@@ -395,32 +389,16 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	public boolean onOptionsItemSelected(MenuItem item) {
 		
 		int id = item.getItemId();
-		if (drawertoggle.onOptionsItemSelected(item))
-		{
+		if (drawertoggle.onOptionsItemSelected(item)){
 			return true;
 		}
 		if (id == R.id.action_settings) {
 			this.openSettingsActivity();
-            //DialogHour d=new DialogHour(MainActivity.this);
-            //d.show();
-            /*d.onOK(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.v("value", ((Button)v).getTag().toString() );
-                }
-            });*/
-
-
-
 			return true;
-		}
-		else if(id==R.id.action_locate)
-		{
+		} else if(id==R.id.action_locate) {
 			this.center_map_to_location();
 			return true;
-		}
-		else if(id==R.id.action_delete_marker)
-		{
+		} else if(id==R.id.action_delete_marker) {
 			this.deleSelectedPOI();
 			return true;
 		}
@@ -942,7 +920,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
                 public void onFocusChange(final View vi, boolean hasFocus) {
                     if (hasFocus)
                     {
-                        DialogHour d = new DialogHour(vi.getContext(), ((EditText) vi).getText().toString());
+                        FieldHour d = new FieldHour(vi.getContext(), ((EditText) vi).getText().toString());
                         d.onOK(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {

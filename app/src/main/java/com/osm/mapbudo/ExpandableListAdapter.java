@@ -1,6 +1,5 @@
 package com.osm.mapbudo;
- 
-//import MainActivitty;
+
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;

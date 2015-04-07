@@ -11,9 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.util.Log;
-
-
 
 public class ValuesActivity extends ActionBarActivity {
 
@@ -33,7 +30,6 @@ public class ValuesActivity extends ActionBarActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.values, menu);
 		return true;
@@ -83,7 +79,7 @@ public class ValuesActivity extends ActionBarActivity {
                 public void onFocusChange(final View vi, boolean hasFocus) {
                     if (!hasFocus)
                     {
-                        DialogHour d = new DialogHour(vi.getContext(), ((EditText) vi).getText().toString());
+                        FieldHour d = new FieldHour(vi.getContext(), ((EditText) vi).getText().toString());
                         d.onOK(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {

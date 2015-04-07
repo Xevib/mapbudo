@@ -43,12 +43,9 @@ public class Settings extends ActionBarActivity {
 		});
 		SharedPreferences preferences =  getSharedPreferences("com.osm.budomap", Context.MODE_PRIVATE);
 
-		if (preferences.getBoolean("save_password", true))
-		{
+		if (preferences.getBoolean("save_password", true)) {
 			cbSave.setChecked(true);
-		}
-		else
-		{
+		} else {
 			cbSave.setChecked(false);
 		}
 
@@ -56,30 +53,21 @@ public class Settings extends ActionBarActivity {
 			
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				
-				if (isChecked)
-				{
+				if (isChecked){
 					save_password();
-				}
-				else
-				{
+				} else {
 					no_save_password();
 				}
-				
-				
-				
 			}
 		});
 	}
-	public void save_password()
-	{
+	public void save_password() {
 		SharedPreferences preferences =  this.getSharedPreferences("com.osm.budomap", Context.MODE_PRIVATE);
 		preferences.edit().putBoolean("valid_user", true).commit();
 		preferences.edit().putBoolean("save_password", true).commit();
 		
 	}
-	public void no_save_password()
-	{
+	public void no_save_password() {
 		SharedPreferences preferences =  this.getSharedPreferences("com.osm.budomap", Context.MODE_PRIVATE);
 		preferences.edit().putBoolean("valid_user", false).commit();
 		preferences.edit().putBoolean("save_password", false).commit();

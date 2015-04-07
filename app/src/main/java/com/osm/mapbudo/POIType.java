@@ -31,10 +31,6 @@ public class POIType {
 	{
 		return this.name;
 	}
-	public void setHeredated(HashMap<String,String> heredated)
-	{
-		this.heredated=heredated;
-	}
 	public HashMap<String,String> getHeredated()
 	{
 		return this.heredated;
@@ -46,15 +42,11 @@ public class POIType {
 		while (it.hasNext())
 		{
 			element=it.next();
-			if (tags.containsKey(element.getKey()))
-			{
-				if( !(tags.get(element.getKey()).equals( this.heredated.get(element.getKey()))))
-				{
+			if (tags.containsKey(element.getKey())) {
+				if( !(tags.get(element.getKey()).equals( this.heredated.get(element.getKey())))){
 					return false;
 				}
-			}
-			else
-			{
+			} else {
 				return false;
 			}
 		}
@@ -74,14 +66,10 @@ public class POIType {
 		List<Pair<String,String>> ret=new ArrayList<Pair<String,String>>();
 		Iterator<Entry<String,String>> it=this.heredated.entrySet().iterator();
 		Entry<String,String>element;
-		while (it.hasNext())
-		{
+		while (it.hasNext()) {
 			element=it.next();
 			ret.add(new Pair<String,String>(element.getKey(),element.getValue()));
 		}
 		return ret;
 	}
-	
-	
-	
 }

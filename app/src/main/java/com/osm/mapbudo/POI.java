@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import org.osmdroid.util.GeoPoint;
 import org.w3c.dom.Node;
 
-//import android.util.Log;
 
 public class POI {
 
@@ -37,12 +36,9 @@ public class POI {
 		this.osmId=osmId;
 		this.lat=lat;
 		this.lon=lon;
-		if (values==null)
-		{
+		if (values==null){
 			this.values=new HashMap<String,String>();
-		}
-		else
-		{
+		} else {
 			this.values=values;
 		}
 	}
@@ -52,8 +48,7 @@ public class POI {
 		this.lon=Double.parseDouble(item.getAttributes().getNamedItem("lon").getNodeValue());
 		this.version=Integer.parseInt(item.getAttributes().getNamedItem("version").getNodeValue());
 		values=new HashMap<String,String>();
-		for(int x=1;x<(item.getChildNodes().getLength()-1);x+=2)
-		{
+		for(int x=1;x<(item.getChildNodes().getLength()-1);x+=2) {
 			values.put(item.getChildNodes().item(x).getAttributes().getNamedItem("k").getNodeValue(), item.getChildNodes().item(x).getAttributes().getNamedItem("v").getNodeValue());
 		}
 	}
@@ -99,18 +94,14 @@ public class POI {
 	}
 	public String getXMLCreate(String changeset) {
 		String xml;
-		if (this.id==null)
-		{
+		if (this.id==null){
 			xml="<node id='"+this.osmId+"' changeset='"+changeset+"' lat='"+this.lat+"' lon='"+this.lon+"'>";
-		}
-		else
-		{
+		} else {
 			xml="<node id='-"+this.id+"' changeset='"+changeset+"' lat='"+this.lat+"' lon='"+this.lon+"'>";
 		}
 		Iterator<Entry<String, String>> it= values.entrySet().iterator();
 		Entry<String,String> pair;
-		while (it.hasNext())
-		{
+		while (it.hasNext()) {
 			pair=it.next();
 			xml=xml.concat("<tag k='"+ pair.getKey()+"' v='"+pair.getValue()+"'/>");
 		}
@@ -121,8 +112,7 @@ public class POI {
 		String xml="<node id='"+this.osmId+"' version='"+this.version+"' changeset='"+changeset+"' lat='"+this.lat+"' lon='"+this.lon+"'>";
 		Iterator<Entry<String, String>> it= values.entrySet().iterator();
 		Entry<String,String> pair;
-		while (it.hasNext())
-		{
+		while (it.hasNext()) {
 			pair=it.next();
 			
 			xml=xml.concat("<tag k='"+pair.getKey()+"' v='"+pair.getValue()+"'/>");
@@ -150,16 +140,12 @@ public class POI {
 	public void detect_type(List<POIType> avaible_types)
 	{
 		int x=0;
-		while (x<avaible_types.size()&&(!avaible_types.get(x).match(this.values)))
-		{
+		while (x<avaible_types.size()&&(!avaible_types.get(x).match(this.values))){
 			x++;
 		}
-		if(x<avaible_types.size())
-		{
+		if(x<avaible_types.size()) {
 			this.type=avaible_types.get(x);
-		}
-		else
-		{
+		} else {
 			this.type=null;
 		}
 	}
@@ -167,5 +153,4 @@ public class POI {
 		this.values=values;
 		
 	}
-	
 }

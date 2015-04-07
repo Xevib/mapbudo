@@ -34,7 +34,6 @@ import org.xml.sax.InputSource;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-//import android.util.Log;
 import android.util.Pair;
 
 public class AsyncSync extends AsyncTask< HashMap<String,List<POI>>,Object,Pair<Integer,Integer>> {
@@ -46,18 +45,16 @@ public class AsyncSync extends AsyncTask< HashMap<String,List<POI>>,Object,Pair<
     private List<Pair<Long, Long>> id_conversion;
     public MainActivity main;
 
-    public  void setActivity(MainActivity m)
-    {
-        this.main=m;
-    }
+    /*public  void setActivity(MainActivity m){
 
-	public void setAuth(String username,String password)
-	{
+        this.main=m;
+    }*/
+
+	public void setAuth(String username,String password){
 		this.username=username;
 		this.password=password;
 	}
-	public void setContext(Context c)
-	{
+	public void setContext(Context c){
 		this.c=c;
 	}
 	
