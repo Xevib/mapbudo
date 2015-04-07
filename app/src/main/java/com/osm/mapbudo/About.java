@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 
 public class About extends FragmentActivity {
 
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -32,10 +31,6 @@ public class About extends FragmentActivity {
 	}
 
 	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_about,container, false);
