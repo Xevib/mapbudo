@@ -13,11 +13,13 @@ public class POIType {
 	HashMap<String,String> heredated;
 	Drawable icon;
 	String name;
+    List<Field> fields;
 	public POIType(String name,HashMap<String,String> heredated )
 	{
-		this.name=name;
-		this.heredated=heredated;
-		this.icon=null;
+		this.name = name;
+		this.heredated = heredated;
+		this.icon = null;
+        this.fields = new ArrayList<Field>();
 	}
 	
 	
@@ -26,6 +28,7 @@ public class POIType {
 		this.heredated=heredated;
 		this.icon=icon;
 	}
+
 
 	public String getName()
 	{
@@ -72,4 +75,8 @@ public class POIType {
 		}
 		return ret;
 	}
+    public void addField(Field f)
+    {
+        this.fields.add(f);
+    }
 }
