@@ -54,6 +54,7 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.FrameLayout;
+import android.widget.GridLayout;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements MapEventsReceiver,OnMarkerDragListener {
@@ -380,53 +381,35 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		this.selected_marker=marker;
 		this.showValues();
 		
-		if (p.getValue("name")!=null)
-		{
-			((EditText)this.findViewById(R.id.etName)).setText(p.getValue("name"));	
+		if (p.getValue("name")!=null) {
+			//((EditText)this.findViewById(R.id.etName)).setText(p.getValue("name"));
+		} else {
+			//((EditText)this.findViewById(R.id.etName)).setText("");
 		}
-		else
-		{
-			((EditText)this.findViewById(R.id.etName)).setText("");
+		if(p.getValue("address")!=null) {
+			//((EditText)this.findViewById(R.id.etAdress)).setText(p.getValue("adress"));
+		} else {
+			//((EditText)this.findViewById(R.id.etAdress)).setText("");
 		}
-		if(p.getValue("address")!=null)
-		{
-			((EditText)this.findViewById(R.id.etAdress)).setText(p.getValue("adress"));
+		if(p.getValue("website")!=null) {
+			//((EditText)this.findViewById(R.id.etWeb)).setText(p.getValue("website"));
+		} else {
+			//((EditText)this.findViewById(R.id.etWeb)).setText("");
 		}
-		else
-		{
-			((EditText)this.findViewById(R.id.etAdress)).setText("");
+		if(p.getValue("phone")!=null) {
+			//((EditText)this.findViewById(R.id.etPhone)).setText(p.getValue("phone"));
+		} else {
+			//((EditText)this.findViewById(R.id.etPhone)).setText("");
 		}
-		if(p.getValue("website")!=null)
-		{
-			((EditText)this.findViewById(R.id.etWeb)).setText(p.getValue("website"));
+		if(p.getValue("opening_hours")!=null){
+			//((EditText)this.findViewById(R.id.etHours)).setText(p.getValue("opening_hours"));
+		} else {
+			//((EditText)this.findViewById(R.id.etHours)).setText("");
 		}
-		else
-		{
-			((EditText)this.findViewById(R.id.etWeb)).setText("");	
-		}
-		if(p.getValue("phone")!=null)
-		{
-			((EditText)this.findViewById(R.id.etPhone)).setText(p.getValue("phone"));
-		}
-		else
-		{
-			((EditText)this.findViewById(R.id.etPhone)).setText("");	
-		}
-		if(p.getValue("opening_hours")!=null)
-		{
-			((EditText)this.findViewById(R.id.etHours)).setText(p.getValue("opening_hours"));
-		}
-		else
-		{
-			((EditText)this.findViewById(R.id.etHours)).setText("");
-		}
-		if(p.getValue("description")!=null)
-		{
-			((EditText)this.findViewById(R.id.etDescription)).setText(p.getValue("description"));
-		}
-		else
-		{
-			((EditText)this.findViewById(R.id.etDescription)).setText("");
+		if(p.getValue("description")!=null) {
+			//((EditText)this.findViewById(R.id.etDescription)).setText(p.getValue("description"));
+		} else {
+			//((EditText)this.findViewById(R.id.etDescription)).setText("");
 		}
 		
 
@@ -670,16 +653,19 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 			
 			View rootView = inflater.inflate(R.layout.fragment_values,container, false);
 			//Bundle b=this.getActivity().getIntent().getExtras();
+            Field f = new Field("titol","");
+            ViewGroup vg = (ViewGroup)rootView.findViewById(R.id.grid);
+            rootView = f.addView(this.getActivity(),vg);
 			Button save=(Button) rootView.findViewById(R.id.save);
 			
-			final EditText etName=(EditText)rootView.findViewById(R.id.etName);
+			/*final EditText etName=(EditText)rootView.findViewById(R.id.etName);
 			final EditText etAdress=(EditText)rootView.findViewById(R.id.etAdress);
 			final EditText etDescription=(EditText)rootView.findViewById(R.id.etDescription);
 			final EditText etHours=(EditText)rootView.findViewById(R.id.etHours);
 			final EditText etPhone=(EditText)rootView.findViewById(R.id.etPhone);
-			final EditText etWeb=(EditText)rootView.findViewById(R.id.etWeb);
+			final EditText etWeb=(EditText)rootView.findViewById(R.id.etWeb);*/
 
-            etHours.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            /*etHours.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(final View vi, boolean hasFocus) {
                     if (hasFocus)
@@ -694,7 +680,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
                         d.show();
                     }
                 }
-            });
+            });*/
 
 			save.setOnClickListener(new View.OnClickListener() {
 				
@@ -702,7 +688,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 				public void onClick(View v) {
 					HashMap<String,String> values=new HashMap<String,String>();
 					
-					if (! etName.getText().toString().equalsIgnoreCase(""))
+					/*if (! etName.getText().toString().equalsIgnoreCase(""))
 					{
 						values.put("name", etName.getText().toString());
 						etName.setText("");
@@ -731,7 +717,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 					{
 						values.put("web", etWeb.getText().toString());
 						etWeb.setText("");
-					}
+					}*/
 					mCallback.setValuesOfNewPOI(values);
 					mCallback.hideValues();
 					mCallback.createNewPOI();
