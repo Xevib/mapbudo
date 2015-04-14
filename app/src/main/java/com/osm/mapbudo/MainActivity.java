@@ -6,6 +6,7 @@ package com.osm.mapbudo;
 //TODO O encara més... Molaria molt que poguessis escollir perfils. Per exemple, perfil «Muntanya» amb etiquetes del tipus de nodes que podries trobar allà, o perfil «Ciutat» o altres...
 //TODO Etiquetes com «Opening_hours» haurien de disposar d'algun tipus d'ajuda. Un desplegable amb exemples o quelcom similar. Jo no tinc pebrots d'emplenar aquesta etiqueta sense una xuleta.
 //TODO Per etiquetes amb molts valors (com «Services» o «Shoping») estaria molt bé plegar la categoria des del darrer valor de la categoria, ja que si no t'obliga a fer scroll fins a dalt de tot per poder tancar-la.
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.Toast;
+import android.support.v4.view.GravityCompat;
 
 public class MainActivity extends ActionBarActivity implements MapEventsReceiver,OnMarkerDragListener {
 	private DrawerLayout drawerlayout;
@@ -97,9 +99,8 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		drawerlist=(ExpandableListView) this.findViewById(R.id.left_drawer);
 		this.avaible_types= new ArrayList<POIType>();
 
-
         this.filt =this.initializeFiltter();
-		avaible_types=new ArrayList<POIType>();
+
 
 		ExpandableListAdapter ExpLstAdapter = new ExpandableListAdapter(this, filt);
 		drawerlist.setAdapter(ExpLstAdapter);
@@ -109,7 +110,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		drawerlist.setOnChildClickListener(new OnChildClickListener() {
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v,int groupPosition, int position, long id) {
-				setTypeOfNewPOI(filt.getType(groupPosition,position));
+				setNewPOIType(filt.getType(groupPosition,position));
 				drawerlayout.closeDrawer(Gravity.LEFT);
 				return false;
 			}
@@ -201,14 +202,6 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		bd.close();
 		
 		Boolean suc=((MapView)this.findViewById(R.id.mapview)).getOverlays().remove(this.selected_marker);
-		if (suc)
-		{
-			Log.v("ui","Removed succesfuly");
-		}
-		else
-		{
-			Log.v("ui","Not removed");
-		}
 		OSMAPI api=new OSMAPI(this);
 		api.addPOI(filt.getTypes());
 		this.hideValues();
@@ -478,10 +471,8 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 			
 			@Override
 			public boolean onMarkerClick(Marker marker, MapView mapView) {
-				Log.v("bd","open");
 				BD bd=new BD(mapView.getContext());
 				POI p=bd.getPOI(Long.valueOf(marker.getTitle()),((MainActivity)mapView.getContext()).getAvaibleTypes());
-				Log.v("bd","close");
 				bd.close();
                 selected_marker=marker;
     			((MainActivity)mapView.getContext()).setMenuItemSelected(p,marker);
@@ -583,7 +574,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	            {
 	            	tags.put("web",web);
 	            }
-	            Log.v("bd","open");
+
 	            BD bd=new BD(getApplicationContext());
 	            Long id=bd.getFreeId();
 	            POI p=new POI(lat,lon,tags, id, null,null,1);
@@ -594,7 +585,6 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	            GeoPoint gp = new GeoPoint(lat, lon,0 );
 		        
 	            layerPOIs.addItem(new OverlayItem(name, description, gp));
-	            Log.v("bd", "close");
 	            bd.close();
 	            OSMAPI api=new OSMAPI(this);
 	            List<POI> points=new ArrayList<POI>();
@@ -620,7 +610,6 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	        MapView map=(MapView) findViewById(R.id.mapview);
 	        GeoPoint gp=new GeoPoint(loc.getLatitude(),loc.getLongitude(),0);
 	        map.getController().setCenter(gp);
-	        
 	    }
 
 	    @Override
@@ -635,7 +624,6 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 
 	    @Override
 	    public void onStatusChanged(String provider, int status, Bundle extras) {}
-
 		
 	}
 	
@@ -650,13 +638,20 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-			
-			View rootView = inflater.inflate(R.layout.fragment_values,container, false);
-			//Bundle b=this.getActivity().getIntent().getExtras();
-            Field f = new Field("titol","");
-            ViewGroup vg = (ViewGroup)rootView.findViewById(R.id.grid);
-            rootView = f.addView(this.getActivity(),vg);
-			Button save=(Button) rootView.findViewById(R.id.save);
+            View rootView = inflater.inflate(R.layout.fragment_values,container, false);
+            MainActivity m=(MainActivity)rootView.getContext();
+            if (m.getNewPOIType()!=null) {
+                Log.v("m",m.toString());
+                List<Field> fields = m.getNewPOIType().getFields();
+                Field f;
+                if (fields!=null) {
+                    for (int x = 0; x < fields.size(); x++) {
+                        f = fields.get(x);
+                        f.addView(this.getActivity(), (ViewGroup) rootView);
+                    }
+                }
+
+                Button save = (Button) rootView.findViewById(R.id.save);
 			
 			/*final EditText etName=(EditText)rootView.findViewById(R.id.etName);
 			final EditText etAdress=(EditText)rootView.findViewById(R.id.etAdress);
@@ -682,11 +677,11 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
                 }
             });*/
 
-			save.setOnClickListener(new View.OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					HashMap<String,String> values=new HashMap<String,String>();
+                save.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        HashMap<String, String> values = new HashMap<String, String>();
 					
 					/*if (! etName.getText().toString().equalsIgnoreCase(""))
 					{
@@ -718,12 +713,12 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 						values.put("web", etWeb.getText().toString());
 						etWeb.setText("");
 					}*/
-					mCallback.setValuesOfNewPOI(values);
-					mCallback.hideValues();
-					mCallback.createNewPOI();
-				}
-			});
-			
+                        mCallback.setValuesOfNewPOI(values);
+                        mCallback.hideValues();
+                        mCallback.createNewPOI();
+                    }
+                });
+            }
 			return rootView;
 		}
 		@Override
@@ -752,6 +747,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	}
 	public void showValues()
 	{
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame_values, new PlaceholderFragmentValue()).commit();
 		FrameLayout frame_values = (FrameLayout) findViewById(R.id.frame_values);
 		frame_values.setVisibility(View.VISIBLE);
 		drawerlayout.closeDrawers();
@@ -774,24 +770,24 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	protected void setValuesOfNewPOI(HashMap<String, String> values) {
 		this.newPOI_values=values;
 	}
-	protected void setTypeOfNewPOI(POIType type)
+	protected void setNewPOIType(POIType type)
 	{
 		this.newPOI_type=type;
 	}
+    protected  POIType getNewPOIType()
+    {
+        return this.newPOI_type;
+    }
 
 	protected void createNewPOI()
 	{
+
 		MapView map=(MapView)this.findViewById(R.id.mapview);
 		BD bd=new BD(this);
-		Log.v("bd","open");
         Long id=bd.getFreeId();
         POI p=new POI(this.newPOI_lat,this.newPOI_lon,this.newPOI_values, id, null,null,1);
         p.setType(this.newPOI_type);
-
-        Log.v("bd", "id new poi->"+String.valueOf(id));
-
         bd.addPOI(p, "created");
-        Log.v("bd", "close");
         bd.close();
         
 
@@ -819,6 +815,10 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	        	this.hideValues();
 	        	return true;
 	        }
+            else if (drawerlayout.isDrawerOpen(GravityCompat.START)) {
+                drawerlayout.closeDrawer(Gravity.LEFT);
+                return false;
+            }
 	    }
 	    return super.onKeyDown(keyCode, event);
 	}
@@ -826,9 +826,8 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	public void onStop()
 	{
 		super.onStop();
-		
+
 		this.save_state();
-		
 	}
 
 	private void save_state() {
@@ -862,24 +861,16 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	}
 
 	@Override
-	public void onMarkerDrag(Marker marker) {
-		
-		Log.v("Drag", "Mig");
-	}
+	public void onMarkerDrag(Marker marker) {}
 
 	@Override
 	public void onMarkerDragEnd(Marker marker) {
 		MapView map=((MapView)this.findViewById(R.id.mapview));
-		
 		map.getOverlays().remove(this.marker_drag);
-		//map.invalidate();
-		Log.v("Drag", "End");
 		map.getOverlays().add(marker);
 		BD bd=new BD(this);
-		Log.v("bd", "open");
 		POI p= bd.getPOI(Long.valueOf(marker.getTitle()), filt.getTypes());
 		p.setGeoPoint(marker.getPosition());
-		Log.v("bd", "close");
 		bd.updatePOI(p);
 		bd.close();
 		OSMAPI api=new OSMAPI(this);
@@ -889,7 +880,6 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 
 	@Override
 	public void onMarkerDragStart(Marker marker) {
-		Log.v("Drag", "Start");
 		Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
 		v.vibrate(100);
 		this.marker_drag=marker;
@@ -900,18 +890,14 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		List<Overlay> overlay_list =((MapView)this.findViewById(R.id.mapview)).getOverlays();
 		int x;
 		Marker tmp;
-		for (POI p:outdated_pois)
-		{
-			if( p.getStatus().equalsIgnoreCase("created"))
-			{
+		for (POI p:outdated_pois) {
+			if( p.getStatus().equalsIgnoreCase("created")) {
 
 				x=1;
-				while (x<overlay_list.size() &&(Long.valueOf(((Marker)overlay_list.get(x)).getTitle())!=(-1*p.getId())))
-				{
+				while (x<overlay_list.size() &&(Long.valueOf(((Marker)overlay_list.get(x)).getTitle())!=(-1*p.getId()))) {
 					x++;
 				}
-				if ((x<overlay_list.size()) && (Long.valueOf(((Marker)overlay_list.get(x)).getTitle())==(-1*p.getId())))
-				{
+				if ((x<overlay_list.size()) && (Long.valueOf(((Marker)overlay_list.get(x)).getTitle())==(-1*p.getId()))) {
 						tmp=(Marker) overlay_list.get(x);
 						tmp.setTitle(p.getOsmId().toString());
 						((MapView)this.findViewById(R.id.mapview)).getOverlays().set(x, tmp);
@@ -923,140 +909,248 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	{
 		return this.filt;
 	}
-	public static void end()
-	{
+	public static void end() {
 		
 		
 	}
     private void addAvaibleType(POIType t) {
         this.avaible_types.add(t);
     }
-    private Filter initializeFiltter()
-    {
+    private Filter initializeFiltter() {
         Filter filt=new Filter();
         filt.clearGroups();
+        List<Field> default_fields= new ArrayList<Field>();
+        default_fields.add(new Field(this,this.getResources().getString(R.string.name),"name"));
+        default_fields.add(new Field(this,this.getResources().getString(R.string.adress),"adress"));
+        default_fields.add(new Field(this,this.getResources().getString(R.string.web),"website"));
+        default_fields.add(new Field(this,this.getResources().getString(R.string.phone),"phone"));
+        default_fields.add(new Field(this,this.getResources().getString(R.string.opening_hours),"opening_hours"));
+        default_fields.add(new Field(this,this.getResources().getString(R.string.description),"description"));
+
+
         POIType atm = new POIType("ATM",new HashMap<String, String>() { { put("amenity","atm"); } },getResources().getDrawable( R.drawable.atm ) );
+        atm.setFields(default_fields);
         POIType bank = new POIType("Bank",new HashMap<String, String>() { { put("amenity","bank"); } },getResources().getDrawable(R.drawable.bank)) ;
+        bank.setFields(default_fields);
         POIType drinking_water = new POIType("Drinking water",new HashMap<String, String>() { { put("amenity","drinking_water");}},getResources().getDrawable(R.drawable.drinkingwater) );
+        drinking_water.setFields(default_fields);
         POIType hair_dresser = new POIType("Hair Dressser",new HashMap<String, String>() { { put("shop","hairdresser"); } },getResources().getDrawable(R.drawable.hairdresser));
+        hair_dresser.setFields(default_fields);
         POIType laundary = new POIType("Laundry",new HashMap<String, String>() { { put("shop","laundry"); } },getResources().getDrawable(R.drawable.laundry));
+        laundary.setFields(default_fields);
         POIType post_box = new POIType("Post Box",new HashMap<String, String>() { { put("amenity","post_box"); } },getResources().getDrawable(R.drawable.postbox) );
+        post_box.setFields(default_fields);
         POIType post_office = new POIType("Post Office",new HashMap<String, String>() { { put("amenity","post_office"); } },getResources().getDrawable(R.drawable.postoffice));
+        post_office.setFields(default_fields);
         POIType public_toilets= new POIType("Public Toilets",new HashMap<String, String>() { { put("amenity","toilets"); } },getResources().getDrawable(R.drawable.toilets));
+        public_toilets.setFields(default_fields);
         POIType recycling = new POIType("Recycling",new HashMap<String, String>() { { put("amenity","recycling"); } },getResources().getDrawable(R.drawable.recycling));
+        recycling.setFields(default_fields);
         POIType survillance = new POIType("Surveillance",new HashMap<String, String>() { { put("amenity","surveillance"); } },getResources().getDrawable(R.drawable.surveillance));
+        survillance.setFields(default_fields);
         POIType phone = new POIType("Phone",new HashMap<String, String>() { { put("amenity","telephone"); } },getResources().getDrawable(R.drawable.telephone));
+        phone.setFields(default_fields);
         filt.addGroup("Services",Arrays.asList(atm, bank, drinking_water,hair_dresser,laundary,post_box,post_office,public_toilets,recycling,survillance,phone)) ;
 
+
         POIType town_hall = new POIType("Town Hall",new HashMap<String, String>() { { put("amenity","townhall"); } },getResources().getDrawable(R.drawable.townhall));
+        town_hall.setFields(default_fields);
         POIType fire_station = new POIType("Fire Station",new HashMap<String, String>() { { put("amenity","fire_station"); } },getResources().getDrawable(R.drawable.firestation));
+        fire_station.setFields(default_fields);
         POIType police = new POIType("Police",new HashMap<String, String>() { { put("amenity","police"); } },getResources().getDrawable(R.drawable.police));
+        police.setFields(default_fields);
         POIType prision = new POIType("Police",new HashMap<String, String>() { { put("amenity","police"); } },getResources().getDrawable(R.drawable.police)) ;
+        prision.setFields(default_fields);
         filt.addGroup("Goverment", Arrays.asList(town_hall,fire_station,police,prision));
 
         POIType auto_dealer = new POIType("Auto dealer",new HashMap<String, String>() { { put("shop","car"); } },getResources().getDrawable(R.drawable.car) );
+        auto_dealer.setFields(default_fields);
         POIType car_parts = new POIType("Auto parts and accesories",new HashMap<String, String>() { { put("shop","car_parts"); } },getResources().getDrawable(R.drawable.tyres));
+        car_parts.setFields(default_fields);
         POIType car_rental = new POIType("Car Rental",new HashMap<String, String>() { { put("shop","car_rental"); } },getResources().getDrawable(R.drawable.carrental));
+        car_rental.setFields(default_fields);
         POIType car_repair = new POIType("Car Repair",new HashMap<String, String>() { { put("shop","car_repair"); } },getResources().getDrawable(R.drawable.repairshop)) ;
+        car_repair.setFields(default_fields);
         POIType car_sharing = new POIType("Car Sharing",new HashMap<String, String>() { { put("amenity","car_sharing"); } },getResources().getDrawable(R.drawable.carsharing));
+        car_sharing.setFields(default_fields);
         POIType car_wash = new POIType("Car Wash",new HashMap<String, String>() { { put("amenity","car_wash"); } },getResources().getDrawable(R.drawable.carwash));
+        car_wash.setFields(default_fields);
         POIType fuel_station = new POIType("Fuel Station",new HashMap<String, String>() { { put("amenity","fuel"); } },getResources().getDrawable(R.drawable.fuel));
+        fuel_station.setFields(default_fields);
         POIType parking = new POIType("Parking",new HashMap<String, String>() { { put("amenity","parking"); } },getResources().getDrawable(R.drawable.parking));
+        parking.setFields(default_fields);
         filt.addGroup("Car", Arrays.asList(auto_dealer,car_rental,car_parts,car_repair,car_sharing,car_wash,fuel_station,parking));
 
         POIType collage = new POIType("College",new HashMap<String, String>() { { put("amenity","college"); } },getResources().getDrawable(R.drawable.college));
+        collage.setFields(default_fields);
         POIType kindergarten = new POIType("Kindergarten",new HashMap<String, String>() { { put("amenity","kindergarten"); } },getResources().getDrawable(R.drawable.kindergarten));
+        kindergarten.setFields(default_fields);
         POIType school = new POIType("School",new HashMap<String, String>() { { put("amenity","school"); } },getResources().getDrawable(R.drawable.school));
+        school.setFields(default_fields);
         POIType university = new POIType("University",new HashMap<String, String>() { { put("amenity","university"); } },getResources().getDrawable(R.drawable.university));
+        university.setFields(default_fields);
         filt.addGroup("Education", Arrays.asList(collage,kindergarten,school,university));
 
         POIType arts_centre = new POIType("Arts centre",new HashMap<String, String>() { { put("amenity","arts_centre"); }},getResources().getDrawable(R.drawable.artscentre));
+        arts_centre.setFields(default_fields);
         POIType artwork = new POIType("Artwork",new HashMap<String, String>() { { put("tourism","artwork"); } },getResources().getDrawable(R.drawable.artscentre));
+        artwork.setFields(default_fields);
         POIType cinema = new POIType("Cinema",new HashMap<String, String>() { { put("amenity","cinema"); } },getResources().getDrawable(R.drawable.cinema));
+        cinema.setFields(default_fields);
         POIType library = new POIType("Library",new HashMap<String, String>() { { put("amenity","library"); }},getResources().getDrawable(R.drawable.library));
+        library.setFields(default_fields);
         POIType museum = new POIType("Museum",new HashMap<String, String>() { { put("tourism","museum"); } },getResources().getDrawable(R.drawable.museum));
+        museum.setFields(default_fields);
         POIType nightclub = new POIType("Nightclub",new HashMap<String, String>() { { put("amenity","nightclub"); }},getResources().getDrawable(R.drawable.nightclub));
+        nightclub.setFields(default_fields);
         POIType theatre = new POIType("Theatre",new HashMap<String, String>() { { put("amenity","theatre"); }},getResources().getDrawable(R.drawable.theater));
+        theatre.setFields(default_fields);
         POIType theme_park= new POIType("Theme Park",new HashMap<String, String>() { { put("amenity","theme_park"); } },getResources().getDrawable(R.drawable.themepark));
+        theme_park.setFields(default_fields);
         POIType water_park= new POIType("Water park",new HashMap<String, String>() { { put("amenity","water_park"); } },getResources().getDrawable(R.drawable.waterpark));
+        water_park.setFields(default_fields);
         POIType zoo = new POIType("Zoo",new HashMap<String, String>() { { put("tourism","zoo"); } },getResources().getDrawable(R.drawable.zoo));
+        zoo.setFields(default_fields);
         filt.addGroup("Entretainment", Arrays.asList(arts_centre,artwork,cinema,library,museum,nightclub,theatre,theme_park,water_park,zoo));
 
         POIType bakery =  new POIType("Bakery",new HashMap<String, String>() { { put("shop","bakery"); } },getResources().getDrawable(R.drawable.bakery));
+        bakery.setFields(default_fields);
         POIType cafe = new POIType("Cafe",new HashMap<String, String>() { { put("amenity","cafe"); } },getResources().getDrawable(R.drawable.cafe));
+        cafe.setFields(default_fields);
         POIType fast_food = new POIType("Fast Food",new HashMap<String, String>() { { put("amenity","fast_food"); } },getResources().getDrawable(R.drawable.fastfood));
+        fast_food.setFields(default_fields);
         POIType pub= new POIType("Pub",new HashMap<String, String>() { { put("amenity","pub"); } },getResources().getDrawable(R.drawable.pub));
+        pub.setFields(default_fields);
         POIType restaurant = new POIType("Restaurant",new HashMap<String, String>() { { put("amenity","restaurant"); } },getResources().getDrawable(R.drawable.restaurant));
+        restaurant.setFields(default_fields);
         POIType bar = new POIType("Bar",new HashMap<String, String>() { { put("amenity","bar"); } },getResources().getDrawable(R.drawable.bar));
+        bar.setFields(default_fields);
         filt.addGroup("Food and drinks", Arrays.asList(bakery,cafe,fast_food,pub,restaurant,bar));
 
         POIType dentist =new POIType("Dentist",new HashMap<String, String>() { { put("helthcare","dentist"); }},getResources().getDrawable(R.drawable.dentist));
+        dentist.setFields(default_fields);
         POIType doctor = new POIType("Doctor",new HashMap<String, String>() { { put("amenity","doctors"); } },getResources().getDrawable(R.drawable.doctor));
+        doctor.setFields(default_fields);
         POIType hospital = new POIType("Hospital",new HashMap<String, String>() { { put("amenity","hospital"); }},getResources().getDrawable(R.drawable.hospital));
+        hospital.setFields(default_fields);
         POIType pharmacy =  new POIType("Pharmacy",new HashMap<String, String>() { { put("amenity","pharmacy"); }},getResources().getDrawable(R.drawable.pharmacy));
+        pharmacy.setFields(default_fields);
         POIType veterinary = new POIType("Veterinary",new HashMap<String, String>() { { put("amenity","veterinary"); }},getResources().getDrawable(R.drawable.veterinary));
+        veterinary.setFields(default_fields);
         filt.addGroup("Health care & Vet", Arrays.asList(dentist,doctor,hospital,pharmacy,veterinary));
 
         POIType adult = new POIType("Adult",new HashMap<String, String>() { { put("shop","erotic"); } },getResources().getDrawable(R.drawable.erotic));
+        adult.setFields(default_fields);
         POIType alcohol = new POIType("Alcohol",new HashMap<String, String>() { { put("shop","alcohol"); } },getResources().getDrawable(R.drawable.alcohol));
+        alcohol.setFields(default_fields);
         POIType bicycle = new POIType("Bicycle",new HashMap<String, String>() { { put("shop","bicycle"); } },getResources().getDrawable(R.drawable.bicycle));
+        bicycle.setFields(default_fields);
         POIType books =  new POIType("Books",new HashMap<String, String>() { { put("shop","books"); } },getResources().getDrawable(R.drawable.book));
+        books.setFields(default_fields);
         POIType butcher= new POIType("Butcher",new HashMap<String, String>() { { put("shop","butcher"); } },getResources().getDrawable(R.drawable.butcher));
-        POIType clothers = new POIType("Clothes",new HashMap<String, String>() { { put("shop","clothes"); } },getResources().getDrawable(R.drawable.clothes));
+        butcher.setFields(default_fields);
+        POIType clothes = new POIType("Clothes",new HashMap<String, String>() { { put("shop","clothes"); } },getResources().getDrawable(R.drawable.clothes));
+        clothes.setFields(default_fields);
         POIType computers = new POIType("Computers",new HashMap<String, String>() { { put("shop","computer"); } },getResources().getDrawable(R.drawable.computer));
+        computers.setFields(default_fields);
         POIType convinience = new POIType("Convinience",new HashMap<String, String>() { { put("shop","convenience"); } },getResources().getDrawable(R.drawable.convenience));
+        convinience.setFields(default_fields);
         POIType electronics = new POIType("Electronics",new HashMap<String, String>() { { put("shop","electronics"); } },getResources().getDrawable(R.drawable.electronics));
+        electronics.setFields(default_fields);
         POIType florist = new POIType("Florist",new HashMap<String, String>() { { put("shop","florist"); } },getResources().getDrawable(R.drawable.florist));
+        florist.setFields(default_fields);
         POIType furniture = new POIType("Furniture",new HashMap<String, String>() { { put("shop","furniture"); } },getResources().getDrawable(R.drawable.furniture));
+        furniture.setFields(default_fields);
         POIType sports = new POIType("Sports",new HashMap<String, String>() { { put("shop","sports"); } },getResources().getDrawable(R.drawable.sports));
+        sports.setFields(default_fields);
         POIType jewelers =new POIType("Jewelers",new HashMap<String, String>() { { put("shop","jewelry"); } },getResources().getDrawable(R.drawable.jewelry));
+        jewelers.setFields(default_fields);
         POIType mobile = new POIType("Mobile phones",new HashMap<String, String>() { { put("shop","mobile_phone"); } },getResources().getDrawable(R.drawable.mobilephone));
+        mobile.setFields(default_fields);
         POIType music = new POIType("Music",new HashMap<String, String>() { { put("shop","music"); } },getResources().getDrawable(R.drawable.music));
+        music.setFields(default_fields);
         POIType outdoor= new POIType("Outdoor",new HashMap<String, String>() { { put("shop","outdoor"); } },getResources().getDrawable(R.drawable.outdoor));
+        outdoor.setFields(default_fields);
         POIType photo = new POIType("Photo",new HashMap<String, String>() { { put("shop","photo"); } },getResources().getDrawable(R.drawable.photo));
+        photo.setFields(default_fields);
         POIType shoes= new POIType("Shoes",new HashMap<String, String>() { { put("shop","shoes"); } },getResources().getDrawable(R.drawable.shoes));
+        shoes.setFields(default_fields);
         POIType souvenirs =  new POIType("Sovenirs",new HashMap<String, String>() { { put("shop","gift"); } },getResources().getDrawable(R.drawable.gift));
+        souvenirs.setFields(default_fields);
         POIType stationery=new POIType("Stationery",new HashMap<String, String>() { { put("shop","stationery"); } },getResources().getDrawable(R.drawable.stationery));
+        stationery.setFields(default_fields);
         POIType supermarket= new POIType("Supermarket",new HashMap<String, String>() { { put("shop","supermarket"); } },getResources().getDrawable(R.drawable.supermarket));
+        supermarket.setFields(default_fields);
         POIType toys= new POIType("Toys",new HashMap<String, String>() { { put("shop","toys"); } },getResources().getDrawable(R.drawable.toys));
-        filt.addGroup("Shoping", Arrays.asList(adult,alcohol,bicycle,books,butcher,clothers,computers,convinience,electronics,florist,furniture,sports,jewelers,mobile,music,outdoor,photo,shoes,souvenirs,stationery,supermarket,toys));
+        toys.setFields(default_fields);
+        filt.addGroup("Shoping", Arrays.asList(adult,alcohol,bicycle,books,butcher,clothes,computers,convinience,electronics,florist,furniture,sports,jewelers,mobile,music,outdoor,photo,shoes,souvenirs,stationery,supermarket,toys));
+
 
         POIType archery=new POIType("Archery",new HashMap<String, String>() { { put("sport","archery"); } },getResources().getDrawable(R.drawable.archery));
+        archery.setFields(default_fields);
         POIType athletics=new POIType("Athletics",new HashMap<String, String>() { { put("sport","athletics"); } },getResources().getDrawable(R.drawable.athletics));
+        athletics.setFields(default_fields);
         POIType baseball = new POIType("Baseball",new HashMap<String, String>() { { put("sport","baseball"); } },getResources().getDrawable(R.drawable.baseball));
+        baseball.setFields(default_fields);
         POIType basketball= new POIType("Basketball",new HashMap<String, String>() { { put("sport","basketball"); }},getResources().getDrawable(R.drawable.basketball));
+        basketball.setFields(default_fields);
         POIType boules= new POIType("Boules",new HashMap<String, String>() { { put("sport","boules"); } },getResources().getDrawable(R.drawable.boule));
+        boules.setFields(default_fields);
         POIType bowls= new POIType("Bowls",new HashMap<String, String>() { { put("sport","bowls"); } },getResources().getDrawable(R.drawable.bowls));
+        bowls.setFields(default_fields);
         POIType canoe = new POIType("Caone",new HashMap<String, String>() { { put("sport","canoe"); } },getResources().getDrawable(R.drawable.canoe));
+        canoe.setFields(default_fields);
         POIType climbing = new POIType("Climbing",new HashMap<String, String>() { { put("sport","climbing"); } },getResources().getDrawable(R.drawable.hillclimbing));
+        climbing.setFields(default_fields);
         POIType equestrian = new POIType("Equestrian",new HashMap<String, String>() { { put("sport","equestrian"); } },getResources().getDrawable(R.drawable.equestrian));
+        equestrian.setFields(default_fields);
         POIType motor_sport = new POIType("Motor sport",new HashMap<String, String>() { { put("sport","motor"); } },getResources().getDrawable(R.drawable.motorbike));
+        motor_sport.setFields(default_fields);
         POIType multi= new POIType("Multi",new HashMap<String, String>() { { put("sport","multi"); } },getResources().getDrawable(R.drawable.multi));
+        multi.setFields(default_fields);
         POIType pitch = new POIType("Pitch",new HashMap<String, String>() { { put("leisure","pitch"); } },getResources().getDrawable(R.drawable.pitch));
+        pitch.setFields(default_fields);
         POIType rugby= new POIType("Rugby",new HashMap<String, String>() { { put("sport","rugby_union"); } },getResources().getDrawable(R.drawable.football));
+        rugby.setFields(default_fields);
         POIType shooting= new POIType("Shooting",new HashMap<String, String>() { { put("sport","shooting"); } },getResources().getDrawable(R.drawable.shooting));
+        shooting.setFields(default_fields);
         POIType skateboard= new POIType("Skateboard",new HashMap<String, String>() { { put("sport","skateboard"); } },getResources().getDrawable(R.drawable.skateboard));
+        skateboard.setFields(default_fields);
         POIType skating=new POIType("Skating",new HashMap<String, String>() { { put("sport","skating"); } },getResources().getDrawable(R.drawable.skating));
+        skating.setFields(default_fields);
         POIType soccer= new POIType("Soccer",new HashMap<String, String>() { { put("sport","soccer"); } },getResources().getDrawable(R.drawable.soccer));
+        soccer.setFields(default_fields);
         POIType sport_center= new POIType("Sport Center",new HashMap<String, String>() { { put("leisure","sports_centre"); } },getResources().getDrawable(R.drawable.sportscentre));
+        sport_center.setFields(default_fields);
         POIType stadium=new POIType("Stadium",new HashMap<String, String>() { { put("leisure","stadium"); } },getResources().getDrawable(R.drawable.stadium));
+        stadium.setFields(default_fields);
         POIType swing= new POIType("Stadium",new HashMap<String, String>() { { put("leisure","stadium"); } },getResources().getDrawable(R.drawable.stadium));
+        swing.setFields(default_fields);
         POIType table_tenis= new POIType("Table Tenis",new HashMap<String, String>() { { put("sport","table_tenis"); } },getResources().getDrawable(R.drawable.tabletennis));
+        table_tenis.setFields(default_fields);
         POIType tenis = new POIType("Tenis",new HashMap<String, String>() { { put("sport","tenis"); } },getResources().getDrawable(R.drawable.tennis));
+        tenis.setFields(default_fields);
         POIType track =new POIType("Track",new HashMap<String, String>() { { put("leisure","track"); } },getResources().getDrawable(R.drawable.track));
-        filt.addGroup("Sport",Arrays.asList(archery,athletics,baseball,basketball,boules,bowls,canoe,climbing,equestrian,motor_sport,multi,pitch,shooting,skateboard,skating,soccer,sport_center,swing,table_tenis));
+        track.setFields(default_fields);
+        filt.addGroup("Sport",Arrays.asList(archery,athletics,baseball,basketball,boules,bowls,canoe,climbing,equestrian,motor_sport,multi,pitch,shooting,skateboard,skating,soccer,stadium,sport_center,swing,table_tenis));
 
         POIType bicycle_parking=new POIType("Bicycle parking",new HashMap<String, String>() { { put("amenity","bicycle_parking"); } },getResources().getDrawable(R.drawable.bikeparking));
+        bicycle_parking.setFields(default_fields);
         POIType bicycle_rental=new POIType("Bicycle Rental",new HashMap<String, String>() { { put("amenity","bicycle_rental"); } },getResources().getDrawable(R.drawable.bicyclerental));
+        bicycle_rental.setFields(default_fields);
         POIType bus_stop=new POIType("Bus stop",new HashMap<String, String>() { { put("highway","bus_stop"); } },getResources().getDrawable(R.drawable.bus));
+        bus_stop.setFields(default_fields);
         POIType taxi_stop = new POIType("Taxi stop",new HashMap<String, String>() { { put("amenity","taxi"); } },getResources().getDrawable(R.drawable.taxi));
+        taxi_stop.setFields(default_fields);
         POIType train_stop= new POIType("Train station",new HashMap<String, String>() { { put("building","train_station"); } },getResources().getDrawable(R.drawable.train));
+        train_stop.setFields(default_fields);
         POIType tram_stop= new POIType("Tram stop",new HashMap<String, String>() { { put("railway","tram_stop"); } },getResources().getDrawable(R.drawable.tram));
+        tram_stop.setFields(default_fields);
         filt.addGroup("Transport", Arrays.asList(bicycle_parking,bicycle_rental,bus_stop,taxi_stop,train_stop,tram_stop));
 
         //Add avaible types
 
-        avaible_types=new ArrayList<POIType>();
+        this.avaible_types=new ArrayList<POIType>();
         this.addAvaibleType(atm);
         this.addAvaibleType(bank);
         this.addAvaibleType(drinking_water);
@@ -1117,7 +1211,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
         this.addAvaibleType(bicycle);
         this.addAvaibleType(books);
         this.addAvaibleType(butcher);
-        this.addAvaibleType(clothers);
+        this.addAvaibleType(clothes);
         this.addAvaibleType(computers);
         this.addAvaibleType(convinience);
         this.addAvaibleType(electronics);

@@ -37,18 +37,11 @@ import android.util.Log;
 import android.util.Pair;
 
 public class AsyncSync extends AsyncTask< HashMap<String,List<POI>>,Object,Pair<Integer,Integer>> {
-    //private Integer result;
     private Context c;
     private List<POI> points;
     private String username;
     private String password;
     private List<Pair<Long, Long>> id_conversion;
-    public MainActivity main;
-
-    /*public  void setActivity(MainActivity m){
-
-        this.main=m;
-    }*/
 
 	public void setAuth(String username,String password){
 		this.username=username;

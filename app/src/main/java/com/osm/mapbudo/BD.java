@@ -232,7 +232,6 @@ public class BD{
 			
 			whereArgs = new String[] {String.valueOf(p.getOsmId())};
 			Integer numr=database.update("poi",values, "osmId=?" , whereArgs);
-			Log.v("bd","afected rows->"+numr.toString());
 			database.delete("value", "osmId=?" , whereArgs);
 			
 			ContentValues values_tags;

@@ -4,10 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-
 import org.osmdroid.util.GeoPoint;
 import org.w3c.dom.Node;
-
 
 public class POI {
 
@@ -19,7 +17,6 @@ public class POI {
 	private POIType type;
 	private String status;
 	private int version;
-	
 	public void setVersion(Integer version)
 	{
 		this.version=version;
@@ -99,23 +96,38 @@ public class POI {
 		} else {
 			xml="<node id='-"+this.id+"' changeset='"+changeset+"' lat='"+this.lat+"' lon='"+this.lon+"'>";
 		}
-		Iterator<Entry<String, String>> it= values.entrySet().iterator();
-		Entry<String,String> pair;
+        Iterator<Entry<String, String>> it2= this.type.getHeredated().entrySet().iterator();
+        Entry<String,String> pair;
+        while (it2.hasNext()) {
+            pair=it2.next();
+            xml=xml.concat("<tag k='"+ pair.getKey()+"' v='"+pair.getValue()+"'/>");
+        }
+
+
+        Field f;
+        Iterator<Field> it= this.type.getFields().iterator();
 		while (it.hasNext()) {
-			pair=it.next();
-			xml=xml.concat("<tag k='"+ pair.getKey()+"' v='"+pair.getValue()+"'/>");
+            f= it.next();
+            xml=xml.concat(f.getXML());
 		}
 		xml=xml.concat("</node>");
 		return xml;
 	}
 	public String getXMLModify(String changeset) {
 		String xml="<node id='"+this.osmId+"' version='"+this.version+"' changeset='"+changeset+"' lat='"+this.lat+"' lon='"+this.lon+"'>";
-		Iterator<Entry<String, String>> it= values.entrySet().iterator();
-		Entry<String,String> pair;
+
+        Iterator<Entry<String, String>> it2= this.type.getHeredated().entrySet().iterator();
+        Entry<String,String> pair;
+        while (it2.hasNext()) {
+            pair=it2.next();
+            xml=xml.concat("<tag k='"+ pair.getKey()+"' v='"+pair.getValue()+"'/>");
+        }
+
+        Iterator<Field> it = this.type.getFields().iterator();
+        Field f;
 		while (it.hasNext()) {
-			pair=it.next();
-			
-			xml=xml.concat("<tag k='"+pair.getKey()+"' v='"+pair.getValue()+"'/>");
+            f= it.next();
+			xml=xml.concat(f.getXML());
 		}
 		xml=xml.concat("</node>");
 		return xml;

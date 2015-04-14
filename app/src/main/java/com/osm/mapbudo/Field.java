@@ -1,49 +1,66 @@
 package com.osm.mapbudo;
 
 import android.app.Activity;
-import android.view.View;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-
-import org.xmlpull.v1.XmlPullParserFactory;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-
-
+import android.widget.EditText;
+import android.widget.TextView;
+import java.util.HashMap;
 
 
 public class Field {
-    String title;
-    String xml_view;
-    public Field(String title,String xml) {
-        this.title = title;
-        this.xml_view = xml;
-        this.xml_view="<TextView android:id=\"@+id/textView1\" android:layout_width=\"wrap_content\" android:layout_height=\"wrap_content\" app:layout_gravity=\"left\" android:text=\"@string/name\" /><EditText android:id=\"@+id/etName\" android:layout_width=\"wrap_content\" android:layout_height=\"wrap_content\" android:layout_weight=\"1\" app:layout_gravity=\"left|top\" android:ems=\"10\" ></EditText>";
+    TextView title;
+    Integer type;
+    EditText et;
+    String key;
+
+    public Field(Activity activity,String t,String key) {
+        this.title = new TextView(activity);
+        this.title.setText(t);
+        this.type = null;
+        this.et = null;
+        this.key = key;
     }
-    public ViewGroup addView(Activity activity,ViewGroup root) {
+    public void addView(Activity activity,ViewGroup root) {
+        ViewGroup grid= (ViewGroup)root.findViewById(R.id.grid);
         LayoutInflater inflater = activity.getLayoutInflater();
-        try {
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            factory.setNamespaceAware(true);
-            InputStream is = new ByteArrayInputStream(this.xml_view.getBytes());
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-            XmlPullParser parser = factory.newPullParser();
-            parser.setInput(is, "UTF-8");
-            inflater.inflate(parser, root, true);
-            return root;
+        this.et = new EditText(activity);
+        this.et.setEms(10);
+        if (this.type!=null) {
+            et.setInputType(this.type);
         }
-        catch (XmlPullParserException e)
-        {
-            return null;
+        grid.addView(et, 0);
+        grid.addView(this.title, 0);
+    }
+    public void setType(int type){
+        this.type = type;
+    }
+    public void setKey(String key) {
+        this.key=key;
+    }
+    public HashMap<String,String> getData() {
+        HashMap<String,String> ret= new HashMap<String,String>();
+        ret.put(this.key,this.et.getText().toString());
+        return ret;
+    }
+    public String getValue() {
+        String r=this.et.getText().toString();
+        if (r.length()==0) {
+            return "";
         }
+        if ( r.charAt(r.length()-1)==32) {
+            return r.substring(0, r.length()-1);
+        } else {
+            return r;
+        }
+    }
+    public String getXML() {
+        if (!this.getValue().equalsIgnoreCase("")) {
 
+            return "<tag k='" + this.key + "' v='" + this.getValue() + "'/>";
+        } else {
+            return "";
+        }
     }
 }
 

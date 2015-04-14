@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-
 import android.graphics.drawable.Drawable;
 import android.util.Pair;
 
@@ -78,5 +77,13 @@ public class POIType {
     public void addField(Field f)
     {
         this.fields.add(f);
+    }
+    public List<Field> getFields()
+    {
+        return this.fields;
+    }
+    public void setFields(List<Field> fields)
+    {
+        this.fields=fields;
     }
 }

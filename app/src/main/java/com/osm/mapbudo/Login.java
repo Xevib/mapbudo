@@ -24,36 +24,28 @@ public class Login extends FragmentActivity {
 		setContentView(R.layout.activity_login);
 		
 		SharedPreferences preferences =  getSharedPreferences("com.osm.budomap", Context.MODE_PRIVATE);
-		if (!preferences.contains("save_password"))
-		{
+		if (!preferences.contains("save_password")) {
 			preferences.edit().putBoolean("save_password", true);
 		}
-		if (preferences.getBoolean("valid_user", false) &&(preferences.getBoolean("save_password", true))&&(preferences.contains("password")))
-		{
+		if (preferences.getBoolean("valid_user", false) &&(preferences.getBoolean("save_password", true))&&(preferences.contains("password"))) {
 			Intent i=new Intent(this, MainActivity.class);
 			startActivity(i);
-		}
-		else
-		{
+		} else {
 			if (savedInstanceState == null) {
 				getSupportFragmentManager().beginTransaction().add(R.id.container, new PlaceholderFragment()).commit();
 			}
-
 		}
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.login, menu);
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
+
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
 			return true;
@@ -61,9 +53,6 @@ public class Login extends FragmentActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
 	public static class PlaceholderFragment extends Fragment {
 
 		EditText etUsername;
@@ -79,19 +68,16 @@ public class Login extends FragmentActivity {
 			SharedPreferences preferences =  getActivity().getSharedPreferences("com.osm.budomap", Context.MODE_PRIVATE);
             etUsername=(EditText)rootView.findViewById(R.id.etUsername);
             etPassword=(EditText)rootView.findViewById(R.id.etPassword);
-			if (preferences.getBoolean("save_password", true))
-			{
+			if (preferences.getBoolean("save_password", true)) {
 				etUsername.setText(preferences.getString("user", ""));
 			}
 
 
             Toast.makeText(getActivity(),rootView.getContext().getString(R.string.loginMessage), Toast.LENGTH_LONG).show();
-			
 			btLogin.setOnClickListener(new OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
-
                     OSMAPI api = new OSMAPI(v.getContext());
                     etUsername = (EditText) getActivity().findViewById(R.id.etUsername);
                     etPassword = (EditText) getActivity().findViewById(R.id.etPassword);

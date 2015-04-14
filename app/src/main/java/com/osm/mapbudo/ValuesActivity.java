@@ -62,41 +62,14 @@ public class ValuesActivity extends ActionBarActivity {
 			
 			
 			View rootView = inflater.inflate(R.layout.fragment_values,container, false);
-            GridLayout gl = (GridLayout)getView().findViewById(R.id.grid);
-            //rootView.findViewById(R.id.grid);
-            Field f=new Field("titol","");
 
-            rootView = f.addView(this.getActivity(),gl);
-			//Bundle b=this.getActivity().getIntent().getExtras();
+            GridLayout gl = (GridLayout)getView().findViewById(R.id.grid);
 			Button save=(Button) rootView.findViewById(R.id.save);
 
 
 			final Float lat=this.getActivity().getIntent().getExtras().getFloat("_lat");
 			final Float lon=this.getActivity().getIntent().getExtras().getFloat("_lon");
 
-			//final EditText etName=(EditText)rootView.findViewById(R.id.etName);
-			//final EditText etAdress=(EditText)rootView.findViewById(R.id.etAdress);
-			//final EditText etDescription=(EditText)rootView.findViewById(R.id.etDescription);
-			//final EditText etHours=(EditText)rootView.findViewById(R.id.etHours);
-			//final EditText etPhone=(EditText)rootView.findViewById(R.id.etPhone);
-			//final EditText etWeb=(EditText)rootView.findViewById(R.id.etWeb);
-
-            /*etHours.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(final View vi, boolean hasFocus) {
-                    if (!hasFocus)
-                    {
-                        FieldHour d = new FieldHour(vi.getContext(), ((EditText) vi).getText().toString());
-                        d.onOK(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ((EditText) vi).setText((String) v.getTag());
-                            }
-                        });
-                        d.show();
-                    }
-                }
-            });*/
 
 			save.setOnClickListener(new View.OnClickListener() {
 				@Override
