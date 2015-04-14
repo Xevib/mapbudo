@@ -109,17 +109,6 @@
         app:layout_gravity="fill_horizontal"
         android:ems="10" />
     -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/textView" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/editText"
-        android:ems="10"/>
 
     <Button
         android:id="@+id/save"
