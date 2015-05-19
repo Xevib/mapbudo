@@ -1,12 +1,13 @@
 package com.osm.mapbudo;
 
 import android.app.Activity;
-import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.util.List;
 
 public class Field {
     TextView title;
@@ -21,16 +22,22 @@ public class Field {
         this.et = null;
         this.key = key;
     }
-    public void addView(Activity activity,ViewGroup root) {
-        ViewGroup grid= (ViewGroup)root.findViewById(R.id.grid);
-        LayoutInflater inflater = activity.getLayoutInflater();
+    public List<View> getView(Activity activity) {
+        List<View> l= new ArrayList<View>();
         this.et = new EditText(activity);
         this.et.setEms(10);
         if (this.type!=null) {
             et.setInputType(this.type);
         }
-        grid.addView(et, 0);
-        grid.addView(this.title, 0);
+        l.add(this.et);
+        l.add(this.title);
+        return l;
+    }
+    public void addView(Activity activity,ViewGroup root) {
+        ViewGroup grid= (ViewGroup)root.findViewById(R.id.grid);
+        for(View v:this.getView(activity)) {
+            grid.addView(v,0);
+        }
     }
     public void setType(int type){
         this.type = type;
@@ -56,14 +63,9 @@ public class Field {
     }
     public String getXML() {
         if (!this.getValue().equalsIgnoreCase("")) {
-
             return "<tag k='" + this.key + "' v='" + this.getValue() + "'/>";
         } else {
             return "";
         }
     }
 }
-
-
-
-

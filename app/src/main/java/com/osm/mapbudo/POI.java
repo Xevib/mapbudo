@@ -77,8 +77,7 @@ public class POI {
 	{
 		return this.values.get(key);
 	}
-	public POIType getType()
-	{
+	public POIType getType() {
 		return this.type;
 	}
 	public void setType(POIType type)

@@ -51,11 +51,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.FrameLayout;
-import android.widget.GridLayout;
 import android.widget.Toast;
 import android.support.v4.view.GravityCompat;
 
@@ -67,7 +65,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	private HashMap<String, String> newPOI_values;
 	private double newPOI_lon;
 	private double newPOI_lat;
-	private POIType newPOI_type;
+	private POIType actualPOI_type;
 	private LocationManager locationmanager;
 	private Menu menu;
 	BudoLocationListener bll;
@@ -370,10 +368,14 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	protected void setMenuItemSelected(POI p,Marker marker) {
 		menu.clear();
 		getMenuInflater().inflate(R.menu.item_selected, menu);
-
+        this.actualPOI_type =p.getType();
 		this.selected_marker=marker;
-		this.showValues();
-		
+
+        for (Field f:actualPOI_type.getFields()) {
+
+        }
+
+        this.showValues();
 		if (p.getValue("name")!=null) {
 			//((EditText)this.findViewById(R.id.etName)).setText(p.getValue("name"));
 		} else {
@@ -474,6 +476,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 				BD bd=new BD(mapView.getContext());
 				POI p=bd.getPOI(Long.valueOf(marker.getTitle()),((MainActivity)mapView.getContext()).getAvaibleTypes());
 				bd.close();
+
                 selected_marker=marker;
     			((MainActivity)mapView.getContext()).setMenuItemSelected(p,marker);
 				return false;
@@ -525,7 +528,6 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 
 	@Override
 	public boolean longPressHelper(GeoPoint p) {
-		
 		this.setModeAddPOI(true);
 		drawerlayout.openDrawer(Gravity.START);
 		this.setLatLonOfNewPOI(p.getLatitude(), p.getLongitude());
@@ -549,25 +551,20 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	            ItemizedIconOverlay<OverlayItem> layerPOIs=(ItemizedIconOverlay<OverlayItem>) map.getOverlays().get(1);
 	            HashMap<String,String> tags=new HashMap<String,String>();
 	            
-	            if (name!=null)
-	            {
+	            if (name!=null) {
 	            	tags.put("name",name );
 	            }
-	            if (address!=null)
-	            {
+	            if (address!=null) {
 	
 	            	tags.put("address",address);
 	            }
-	            if (description!=null)
-	            {
+	            if (description!=null) {
 	            	tags.put("description",description);
 	            }
-	            if (opening_hours!=null)
-	            {
+	            if (opening_hours!=null) {
 	            	tags.put("opening_hours",opening_hours);
 	            }
-	            if (phone!=null)
-	            {
+	            if (phone!=null) {
 	            	tags.put("phone",phone);
 	            }
 	            if (web!=null)
@@ -578,7 +575,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	            BD bd=new BD(getApplicationContext());
 	            Long id=bd.getFreeId();
 	            POI p=new POI(lat,lon,tags, id, null,null,1);
-	            p.setType(this.newPOI_type);
+	            p.setType(this.actualPOI_type);
 	            //p.detect_type(avaible_types);
 	            bd.addPOI(p, "create");
 	            
@@ -640,8 +637,8 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_values,container, false);
             MainActivity m=(MainActivity)rootView.getContext();
+            //Redefinir per actual poi
             if (m.getNewPOIType()!=null) {
-                Log.v("m",m.toString());
                 List<Field> fields = m.getNewPOIType().getFields();
                 Field f;
                 if (fields!=null) {
@@ -736,8 +733,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		}
 	}
 	
-	public void follow()
-	{
+	public void follow() {
 		locationmanager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,bll);
 		
 	}
@@ -745,14 +741,12 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	{
 		locationmanager.removeUpdates(bll);
 	}
-	public void showValues()
-	{
+	public void showValues() {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_values, new PlaceholderFragmentValue()).commit();
 		FrameLayout frame_values = (FrameLayout) findViewById(R.id.frame_values);
 		frame_values.setVisibility(View.VISIBLE);
 		drawerlayout.closeDrawers();
 		this.values_visible=true;
-		
 	}
 	public Boolean getModeAddPOI()
 	{
@@ -762,8 +756,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	{
 		this.mode_add_poi=value;
 	}
-	protected void setLatLonOfNewPOI(double lat,double lon)
-	{
+	protected void setLatLonOfNewPOI(double lat,double lon) {
 		this.newPOI_lat=lat;
 		this.newPOI_lon=lon;
 	}
@@ -772,21 +765,20 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	}
 	protected void setNewPOIType(POIType type)
 	{
-		this.newPOI_type=type;
+		this.actualPOI_type=type;
 	}
     protected  POIType getNewPOIType()
     {
-        return this.newPOI_type;
+        return this.actualPOI_type;
     }
 
-	protected void createNewPOI()
-	{
+	protected void createNewPOI() {
 
 		MapView map=(MapView)this.findViewById(R.id.mapview);
 		BD bd=new BD(this);
         Long id=bd.getFreeId();
         POI p=new POI(this.newPOI_lat,this.newPOI_lon,this.newPOI_values, id, null,null,1);
-        p.setType(this.newPOI_type);
+        p.setType(this.actualPOI_type);
         bd.addPOI(p, "created");
         bd.close();
         
@@ -840,7 +832,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	}
 
 	public void setTypeOfNewPOI(String  groupName, Integer second) {
-		this.newPOI_type=filt.getType(groupName, second);
+		this.actualPOI_type=filt.getType(groupName, second);
 	}
 	public void changeFilter(String groupName, Integer second, boolean checked) {
 		POIType t=filt.getType(groupName, second);
