@@ -938,7 +938,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
         museum.setFields(default_fields);
         POIType nightclub = new POIType("Nightclub",new HashMap<String, String>() { { put("amenity","nightclub"); }},getResources().getDrawable(R.drawable.nightclub));
         nightclub.setFields(default_fields);
-        POIType theatre = new POIType("Theatre",new HashMap<String, String>() { { put("amenity","theatre"); }},getResources().getDrawable(R.drawable.theater));
+        POIType theatre = new POIType("Theatre",new HashMap<String, String>() { { put("amenity","theatre"); }},getResources().getDrawable(R.drawable.theatre));
         theatre.setFields(default_fields);
         POIType theme_park= new POIType("Theme Park",new HashMap<String, String>() { { put("amenity","theme_park"); } },getResources().getDrawable(R.drawable.themepark));
         theme_park.setFields(default_fields);
@@ -964,7 +964,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 
         POIType dentist =new POIType("Dentist",new HashMap<String, String>() { { put("helthcare","dentist"); }},getResources().getDrawable(R.drawable.dentist));
         dentist.setFields(default_fields);
-        POIType doctor = new POIType("Doctor",new HashMap<String, String>() { { put("amenity","doctors"); } },getResources().getDrawable(R.drawable.doctor));
+        POIType doctor = new POIType("Doctor",new HashMap<String, String>() { { put("amenity","doctors"); } },getResources().getDrawable(R.drawable.doctors));
         doctor.setFields(default_fields);
         POIType hospital = new POIType("Hospital",new HashMap<String, String>() { { put("amenity","hospital"); }},getResources().getDrawable(R.drawable.hospital));
         hospital.setFields(default_fields);
