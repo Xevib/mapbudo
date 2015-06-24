@@ -894,7 +894,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
         fire_station.setFields(default_fields);
         POIType police = new POIType("Police",new HashMap<String, String>() { { put("amenity","police"); } },getResources().getDrawable(R.drawable.police));
         police.setFields(default_fields);
-        POIType prision = new POIType("Police",new HashMap<String, String>() { { put("amenity","police"); } },getResources().getDrawable(R.drawable.police)) ;
+        POIType prision = new POIType("Prison",new HashMap<String, String>() { { put("amenity","prison"); } },getResources().getDrawable(R.drawable.prison)) ;
         prision.setFields(default_fields);
         filt.addGroup("Goverment", Arrays.asList(town_hall,fire_station,police,prision));
 
