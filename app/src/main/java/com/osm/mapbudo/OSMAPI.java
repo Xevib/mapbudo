@@ -23,13 +23,11 @@ import android.widget.Toast;
 public class OSMAPI {
 	Context context;
     List <Pair<Long,Long>> ids_conversion;
-	public OSMAPI(Context context)
-	{
+	public OSMAPI(Context context) {
 		this.context=context;
 		
 	}
-	public Boolean getUserDetails(String username, String password)
-	{
+	public Boolean getUserDetails(String username, String password) {
 		AsyncTask<String, Object, Boolean> asyncGetDetails=new AsyncTask<String, Object, Boolean>()
 		{
 
@@ -40,21 +38,15 @@ public class OSMAPI {
 			        HttpGet request = new HttpGet("http://api.openstreetmap.org/api/0.6/user/details");
 					request.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials(params[0], params[1]),"UTF-8", false));
 		 			HttpResponse response = httpclient.execute(request);
-		 			if (response.getStatusLine().getStatusCode()==200)
-		 			{
+		 			if (response.getStatusLine().getStatusCode()==200) {
 		 				String resposta = EntityUtils.toString(response.getEntity());
-		 				//Al string hi ha la resposta
-		 				Log.v("tag",resposta);
 		 				return true;
-		 			}
-		 			else
-		 			{
-		 				
+		 			} else {
 		 				Log.v("tag",String.valueOf( response.getStatusLine().getStatusCode()));
 		 				return false;
 		 			}
 		 			
-			       }catch(Exception e){
+			       } catch(Exception e) {
 			           Log.e("log_tag", "Error in http connection "+e.toString());
 			           return false;
 			       }
@@ -97,35 +89,22 @@ public class OSMAPI {
 			((MainActivity)this.context).active_get=true;;
 			async.execute(tags,bbox,zl);
 		}
-		
-		
 	}
 
-	public void addPOI(List<POIType> avaible_types)
-	{
-
+	public void addPOI(List<POIType> avaible_types) {
 		BD bd =new BD(context);
-		Log.v("bd", "open");
 		HashMap<String,List<POI>> outdated=bd.getNotUploadedPOIs(avaible_types);
-		Log.v("bd","close");
 		bd.close();
 		AsyncSync asyncAddPOI=new AsyncSync();
 		asyncAddPOI.setContext(this.context);
 		SharedPreferences preferences =  this.context.getSharedPreferences("com.osm.budomap", Context.MODE_PRIVATE);
 		String user=preferences.getString("user", null);
 		String password=preferences.getString("password", null);
-		if ((user!=null)&& (password!=null))
-		{
+		if ((user!=null)&& (password!=null)) {
 			asyncAddPOI.setAuth(user, password);
 			asyncAddPOI.execute(outdated);
-
-		}
-		else
-		{
+		} else {
 			Toast.makeText(this.context,this.context.getResources().getString(R.string.password_not_set), Toast.LENGTH_LONG).show();
 		}
-		
 	}
-	
-	
 }

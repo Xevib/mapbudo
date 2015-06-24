@@ -6,7 +6,9 @@ package com.osm.mapbudo;
 //TODO O encara més... Molaria molt que poguessis escollir perfils. Per exemple, perfil «Muntanya» amb etiquetes del tipus de nodes que podries trobar allà, o perfil «Ciutat» o altres...
 //TODO Etiquetes com «Opening_hours» haurien de disposar d'algun tipus d'ajuda. Un desplegable amb exemples o quelcom similar. Jo no tinc pebrots d'emplenar aquesta etiqueta sense una xuleta.
 //TODO Per etiquetes amb molts valors (com «Services» o «Shoping») estaria molt bé plegar la categoria des del darrer valor de la categoria, ja que si no t'obliga a fer scroll fins a dalt de tot per poder tancar-la.
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,11 +51,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+import android.support.v4.view.GravityCompat;
 
 public class MainActivity extends ActionBarActivity implements MapEventsReceiver,OnMarkerDragListener {
 	private DrawerLayout drawerlayout;
@@ -63,7 +65,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	private HashMap<String, String> newPOI_values;
 	private double newPOI_lon;
 	private double newPOI_lat;
-	private POIType newPOI_type;
+	private POIType actualPOI_type;
 	private LocationManager locationmanager;
 	private Menu menu;
 	BudoLocationListener bll;
@@ -86,265 +88,27 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		
 		this.values_visible=false;
 		this.active_get=false;
+        this.mode_add_poi=false;
+
 		menu=null;
 		locationmanager = (LocationManager)this.getApplicationContext().getSystemService(LOCATION_SERVICE);
 		bll=new BudoLocationListener();
 		drawerlayout=(DrawerLayout) this.findViewById(R.id.drawer_layout);
 		drawerlist=(ExpandableListView) this.findViewById(R.id.left_drawer);
-		
-		
-		filt=new Filter();
-		filt.clearGroups();
-		filt.addGroup("Services", new ArrayList<POIType>(){{
-			add(new POIType("ATM",new HashMap<String, String>() { { put("amenity","atm"); } },getResources().getDrawable( R.drawable.atm ) ));
-			add(new POIType("Bank",new HashMap<String, String>() { { put("amenity","bank"); } },getResources().getDrawable(R.drawable.bank)) );
-			add(new POIType("Drinking water",new HashMap<String, String>() { { put("amenity","drinking_water");}},getResources().getDrawable(R.drawable.drinkingwater) ) );
-			add(new POIType("Hair Dressser",new HashMap<String, String>() { { put("shop","hairdresser"); } },getResources().getDrawable(R.drawable.hairdresser)) );//
-			add(new POIType("Laundry",new HashMap<String, String>() { { put("shop","laundry"); } },getResources().getDrawable(R.drawable.laundry)) );//
-			add(new POIType("Post Box",new HashMap<String, String>() { { put("amenity","post_box"); } },getResources().getDrawable(R.drawable.postbox)) );//
-			add(new POIType("Post Office",new HashMap<String, String>() { { put("amenity","post_office"); } },getResources().getDrawable(R.drawable.postoffice)) );//		
-			add(new POIType("Public Toilets",new HashMap<String, String>() { { put("amenity","toilets"); } },getResources().getDrawable(R.drawable.toilets)) );//
-			add(new POIType("Recycling",new HashMap<String, String>() { { put("amenity","recycling"); } },getResources().getDrawable(R.drawable.recycling)) );//
-			add(new POIType("Surveillance",new HashMap<String, String>() { { put("amenity","surveillance"); } },getResources().getDrawable(R.drawable.surveillance)) );
-			add(new POIType("Phone",new HashMap<String, String>() { { put("amenity","telephone"); } },getResources().getDrawable(R.drawable.telephone)) );//
-			
-		}});
-		filt.addGroup("Goverment", new ArrayList<POIType>(){{
-			add(new POIType("Town Hall",new HashMap<String, String>() { { put("amenity","townhall"); } },getResources().getDrawable(R.drawable.townhall)) );
-			add(new POIType("Fire Station",new HashMap<String, String>() { { put("amenity","fire_station"); } },getResources().getDrawable(R.drawable.firestation)) );
-			add(new POIType("Police",new HashMap<String, String>() { { put("amenity","police"); } },getResources().getDrawable(R.drawable.police)) );
-			add(new POIType("Prison",new HashMap<String, String>() { { put("amenity","prison"); } },getResources().getDrawable(R.drawable.prison)) );
-		}});
-		filt.addGroup("Car", new ArrayList<POIType>(){{
-			add(new POIType("Auto dealer",new HashMap<String, String>() { { put("shop","car"); } },getResources().getDrawable(R.drawable.car) ));
-			add(new POIType("Auto parts and accesories",new HashMap<String, String>() { { put("shop","car_parts"); } },getResources().getDrawable(R.drawable.tyres)) );
-			add(new POIType("Car Rental",new HashMap<String, String>() { { put("shop","car_rental"); } },getResources().getDrawable(R.drawable.carrental)) );
-			add(new POIType("Car Repair",new HashMap<String, String>() { { put("shop","car_repair"); } },getResources().getDrawable(R.drawable.repairshop)) );
-			add(new POIType("Car Sharing",new HashMap<String, String>() { { put("amenity","car_sharing"); } },getResources().getDrawable(R.drawable.carsharing)) );
-			add(new POIType("Car Wash",new HashMap<String, String>() { { put("amenity","car_wash"); } },getResources().getDrawable(R.drawable.carwash)) );
-			add(new POIType("Fuel Station",new HashMap<String, String>() { { put("amenity","fuel"); } },getResources().getDrawable(R.drawable.fuel)) );
-			add(new POIType("Parking",new HashMap<String, String>() { { put("amenity","parking"); } },getResources().getDrawable(R.drawable.parking)) );			
-		}});
-		filt.addGroup("Education", new ArrayList<POIType>(){{
-			add(new POIType("College",new HashMap<String, String>() { { put("amenity","college"); } },getResources().getDrawable(R.drawable.college)) );
-			add(new POIType("Kindergarten",new HashMap<String, String>() { { put("amenity","kindergarten"); } },getResources().getDrawable(R.drawable.kindergarten)) );
-			add(new POIType("School",new HashMap<String, String>() { { put("amenity","school"); } },getResources().getDrawable(R.drawable.school)) );
-			add(new POIType("University",new HashMap<String, String>() { { put("amenity","university"); } },getResources().getDrawable(R.drawable.university)) );
-		}});
-		filt.addGroup("Entretainment", new ArrayList<POIType>(){{
-			add(new POIType("Arts centre",new HashMap<String, String>() { { put("amenity","arts_centre"); }},getResources().getDrawable(R.drawable.artscentre)) );
-			add(new POIType("Artwork",new HashMap<String, String>() { { put("tourism","artwork"); } },getResources().getDrawable(R.drawable.artscentre) ) );
-			add(new POIType("Cinema",new HashMap<String, String>() { { put("amenity","cinema"); } },getResources().getDrawable(R.drawable.cinema)) );
-			add(new POIType("Library",new HashMap<String, String>() { { put("amenity","library"); }},getResources().getDrawable(R.drawable.library) ) );
-			add(new POIType("Museum",new HashMap<String, String>() { { put("tourism","museum"); } },getResources().getDrawable(R.drawable.museum)) );
-			add(new POIType("Nightclub",new HashMap<String, String>() { { put("amenity","nightclub"); }},getResources().getDrawable(R.drawable.nightclub)) );
-			add(new POIType("Theatre",new HashMap<String, String>() { { put("amenity","theatre"); }},getResources().getDrawable(R.drawable.theater)) );
-			add(new POIType("Theme Park",new HashMap<String, String>() { { put("amenity","theme_park"); } },getResources().getDrawable(R.drawable.themepark)) );
-			add(new POIType("Water park",new HashMap<String, String>() { { put("amenity","water_park"); } },getResources().getDrawable(R.drawable.waterpark)) );
-			add(new POIType("Zoo",new HashMap<String, String>() { { put("tourism","zoo"); } },getResources().getDrawable(R.drawable.zoo)) );
-		}});
-		filt.addGroup("Food and drinks", new ArrayList<POIType>(){{
-			add(new POIType("Bakery",new HashMap<String, String>() { { put("shop","bakery"); } },getResources().getDrawable(R.drawable.bakery)) );//
-			add(new POIType("Cafe",new HashMap<String, String>() { { put("amenity","cafe"); } },getResources().getDrawable(R.drawable.cafe)) );//
-			add(new POIType("Fast Food",new HashMap<String, String>() { { put("amenity","fast_food"); } },getResources().getDrawable(R.drawable.fastfood)) );//
-			add(new POIType("Pub",new HashMap<String, String>() { { put("amenity","pub"); } },getResources().getDrawable(R.drawable.pub)) );//
-			add(new POIType("Restaurant",new HashMap<String, String>() { { put("amenity","restaurant"); } },getResources().getDrawable(R.drawable.restaurant)) );//
-			add(new POIType("Bar",new HashMap<String, String>() { { put("amenity","bar"); } },getResources().getDrawable(R.drawable.bar)) );//
-			
-		}});
-		filt.addGroup("Health care & Vet", new ArrayList<POIType>(){{
-			add(new POIType("Dentist",new HashMap<String, String>() { { put("helthcare","dentist"); }},getResources().getDrawable(R.drawable.dentist) ) );//
-			add(new POIType("Doctor",new HashMap<String, String>() { { put("amenity","doctors"); } },getResources().getDrawable(R.drawable.doctor)) );//
-			add(new POIType("Hospital",new HashMap<String, String>() { { put("amenity","hospital"); }},getResources().getDrawable(R.drawable.hospital)) );//
-			add(new POIType("Pharmacy",new HashMap<String, String>() { { put("amenity","pharmacy"); }},getResources().getDrawable(R.drawable.pharmacy)) );//
-			add(new POIType("Veterinary",new HashMap<String, String>() { { put("amenity","veterinary"); }},getResources().getDrawable(R.drawable.veterinary) ) ); //
-		}});
-		filt.addGroup("Shoping", new ArrayList<POIType>(){{
-			add(new POIType("Adult",new HashMap<String, String>() { { put("shop","erotic"); } },getResources().getDrawable(R.drawable.erotic)) );
-			add(new POIType("Alcohol",new HashMap<String, String>() { { put("shop","alcohol"); } },getResources().getDrawable(R.drawable.alcohol)) );
-			add(new POIType("Bicycle",new HashMap<String, String>() { { put("shop","bicycle"); } },getResources().getDrawable(R.drawable.bicycle)) );
-			add(new POIType("Books",new HashMap<String, String>() { { put("shop","books"); } },getResources().getDrawable(R.drawable.book) ));
-			add(new POIType("Butcher",new HashMap<String, String>() { { put("shop","butcher"); } },getResources().getDrawable(R.drawable.butcher)) );
-			add(new POIType("Clothes",new HashMap<String, String>() { { put("shop","clothes"); } },getResources().getDrawable(R.drawable.clothes)) );
-			add(new POIType("Computers",new HashMap<String, String>() { { put("shop","computer"); } },getResources().getDrawable(R.drawable.computer)) );
-			add(new POIType("Convinience",new HashMap<String, String>() { { put("shop","convenience"); } },getResources().getDrawable(R.drawable.convenience)) );
-			add(new POIType("Electronics",new HashMap<String, String>() { { put("shop","electronics"); } },getResources().getDrawable(R.drawable.electronics)) );
-			add(new POIType("Florist",new HashMap<String, String>() { { put("shop","florist"); } },getResources().getDrawable(R.drawable.florist)) );
-			add(new POIType("Furniture",new HashMap<String, String>() { { put("shop","furniture"); } },getResources().getDrawable(R.drawable.furniture)) );
-			add(new POIType("Sports",new HashMap<String, String>() { { put("shop","sports"); } },getResources().getDrawable(R.drawable.sports)) );
-			add(new POIType("Jewelers",new HashMap<String, String>() { { put("shop","jewelry"); } },getResources().getDrawable(R.drawable.jewelry)) );
-			add(new POIType("Mobile phones",new HashMap<String, String>() { { put("shop","mobile_phone"); } },getResources().getDrawable(R.drawable.mobilephone)) );
-			add(new POIType("Music",new HashMap<String, String>() { { put("shop","music"); } },getResources().getDrawable(R.drawable.music)) );
-			add(new POIType("Outdoor",new HashMap<String, String>() { { put("shop","outdoor"); } },getResources().getDrawable(R.drawable.outdoor)) );
-			add(new POIType("Photo",new HashMap<String, String>() { { put("shop","photo"); } },getResources().getDrawable(R.drawable.photo)) );
-			add(new POIType("Shoes",new HashMap<String, String>() { { put("shop","shoes"); } },getResources().getDrawable(R.drawable.shoes)) );
-			add(new POIType("Sovenirs",new HashMap<String, String>() { { put("shop","gift"); } },getResources().getDrawable(R.drawable.gift)) );
-			add(new POIType("Stationery",new HashMap<String, String>() { { put("shop","stationery"); } },getResources().getDrawable(R.drawable.stationery)) );
-			add(new POIType("Supermarket",new HashMap<String, String>() { { put("shop","supermarket"); } },getResources().getDrawable(R.drawable.supermarket)) );
-			add(new POIType("Toys",new HashMap<String, String>() { { put("shop","toys"); } },getResources().getDrawable(R.drawable.toys)) );
-		}});
-		filt.addGroup("Sport", new ArrayList<POIType>(){{
-			add(new POIType("Archery",new HashMap<String, String>() { { put("sport","archery"); } },getResources().getDrawable(R.drawable.archery)) );
-			add(new POIType("Athletics",new HashMap<String, String>() { { put("sport","athletics"); } },getResources().getDrawable(R.drawable.athletics)) );
-			add(new POIType("Baseball",new HashMap<String, String>() { { put("sport","baseball"); } },getResources().getDrawable(R.drawable.baseball)) );
-			add(new POIType("Basketball",new HashMap<String, String>() { { put("sport","basketball"); }},getResources().getDrawable(R.drawable.basketball)) );
-			add(new POIType("Boules",new HashMap<String, String>() { { put("sport","boules"); } },getResources().getDrawable(R.drawable.boule)) );
-			add(new POIType("Bowls",new HashMap<String, String>() { { put("sport","bowls"); } },getResources().getDrawable(R.drawable.bowls)) );
-			add(new POIType("Caone",new HashMap<String, String>() { { put("sport","canoe"); } },getResources().getDrawable(R.drawable.canoe)) );
-			add(new POIType("Climbing",new HashMap<String, String>() { { put("sport","climbing"); } },getResources().getDrawable(R.drawable.hillclimbing)) );
-			add(new POIType("Equestrian",new HashMap<String, String>() { { put("sport","equestrian"); } },getResources().getDrawable(R.drawable.equestrian)) );
-			add(new POIType("Motor sport",new HashMap<String, String>() { { put("sport","motor"); } },getResources().getDrawable(R.drawable.motorbike)) );
-			add(new POIType("Multi",new HashMap<String, String>() { { put("sport","multi"); } },getResources().getDrawable(R.drawable.multi)) );
-			add(new POIType("Pitch",new HashMap<String, String>() { { put("leisure","pitch"); } },getResources().getDrawable(R.drawable.pitch)) );
-			add(new POIType("Rugby",new HashMap<String, String>() { { put("sport","rugby_union"); } },getResources().getDrawable(R.drawable.football)) );
-			add(new POIType("Shooting",new HashMap<String, String>() { { put("sport","shooting"); } },getResources().getDrawable(R.drawable.shooting)) );
-			add(new POIType("Skateboard",new HashMap<String, String>() { { put("sport","skateboard"); } },getResources().getDrawable(R.drawable.skateboard)) );
-			add(new POIType("Skating",new HashMap<String, String>() { { put("sport","skating"); } },getResources().getDrawable(R.drawable.skating)) );
-			add(new POIType("Soccer",new HashMap<String, String>() { { put("sport","soccer"); } },getResources().getDrawable(R.drawable.soccer)) );
-			add(new POIType("Sport Center",new HashMap<String, String>() { { put("leisure","sports_centre"); } },getResources().getDrawable(R.drawable.sportscentre)) );
-			add(new POIType("Stadium",new HashMap<String, String>() { { put("leisure","stadium"); } },getResources().getDrawable(R.drawable.stadium)) );
-			add(new POIType("Swiming",new HashMap<String, String>() { { put("sport","swiming"); } },getResources().getDrawable(R.drawable.swimming)) );
-			add(new POIType("Table Tenis",new HashMap<String, String>() { { put("sport","table_tenis"); } },getResources().getDrawable(R.drawable.tabletennis)) );
-			add(new POIType("Tenis",new HashMap<String, String>() { { put("sport","tenis"); } },getResources().getDrawable(R.drawable.tennis)) );
-			add(new POIType("Track",new HashMap<String, String>() { { put("leisure","track"); } },getResources().getDrawable(R.drawable.track)) );
-		}});
-		filt.addGroup("Transport", new ArrayList<POIType>(){{
-			add(new POIType("Bicycle parking",new HashMap<String, String>() { { put("amenity","bicycle_parking"); } },getResources().getDrawable(R.drawable.bikeparking)) );//
-			add(new POIType("Bicycle Rental",new HashMap<String, String>() { { put("amenity","bicycle_rental"); } },getResources().getDrawable(R.drawable.bicyclerental)) );//
-			add(new POIType("Bus stop",new HashMap<String, String>() { { put("highway","bus_stop"); } },getResources().getDrawable(R.drawable.bus)) );//
-			add(new POIType("Taxi stop",new HashMap<String, String>() { { put("amenity","taxi"); } },getResources().getDrawable(R.drawable.taxi)) );//
-			add(new POIType("Train station",new HashMap<String, String>() { { put("building","train_station"); } },getResources().getDrawable(R.drawable.train)) );//
-			add(new POIType("Tram stop",new HashMap<String, String>() { { put("railway","tram_stop"); } },getResources().getDrawable(R.drawable.tram)) );//
-		}});
-		//Add avaible types
-		
-		avaible_types=new ArrayList<POIType>();
-		avaible_types.add(new POIType("ATM",new HashMap<String, String>() { { put("amenity","atm"); } },getResources().getDrawable( R.drawable.atm ) ));
-		avaible_types.add(new POIType("Bank",new HashMap<String, String>() { { put("amenity","bank"); } },getResources().getDrawable(R.drawable.bank)) );
-		avaible_types.add(new POIType("Drinking water",new HashMap<String, String>() { { put("amenity","drinking_water");}},getResources().getDrawable(R.drawable.drinkingwater) ) );//
-		avaible_types.add(new POIType("Hair Dressser",new HashMap<String, String>() { { put("shop","hairdresser"); } },getResources().getDrawable(R.drawable.hairdresser)) );//
-		avaible_types.add(new POIType("Laundry",new HashMap<String, String>() { { put("shop","laundry"); } },getResources().getDrawable(R.drawable.laundry)) );//
-		avaible_types.add(new POIType("Post Box",new HashMap<String, String>() { { put("amenity","post_box"); } },getResources().getDrawable(R.drawable.postbox)) );//
-		avaible_types.add(new POIType("Post Office",new HashMap<String, String>() { { put("amenity","post_office"); } },getResources().getDrawable(R.drawable.postoffice)) );//		
-		avaible_types.add(new POIType("Public Toilets",new HashMap<String, String>() { { put("amenity","toilets"); } },getResources().getDrawable(R.drawable.toilets)) );//
-		avaible_types.add(new POIType("Recycling",new HashMap<String, String>() { { put("amenity","recycling"); } },getResources().getDrawable(R.drawable.recycling)) );//
-		avaible_types.add(new POIType("Surveillance",new HashMap<String, String>() { { put("amenity","surveillance"); } },getResources().getDrawable(R.drawable.surveillance)) );
-		avaible_types.add(new POIType("Phone",new HashMap<String, String>() { { put("amenity","telephone"); } },getResources().getDrawable(R.drawable.telephone)) );//
-		
-		avaible_types.add(new POIType("Town Hall",new HashMap<String, String>() { { put("amenity","townhall"); } },getResources().getDrawable(R.drawable.townhall)) );//
-		avaible_types.add(new POIType("Fire Station",new HashMap<String, String>() { { put("amenity","fire_station"); } },getResources().getDrawable(R.drawable.firestation)) );//
-		avaible_types.add(new POIType("Police",new HashMap<String, String>() { { put("amenity","police"); } },getResources().getDrawable(R.drawable.police)) );//
-		avaible_types.add(new POIType("Prison",new HashMap<String, String>() { { put("amenity","prison"); } },getResources().getDrawable(R.drawable.prison)) );//
-		
-		
-		avaible_types.add(new POIType("Auto dealer",new HashMap<String, String>() { { put("shop","car"); } },getResources().getDrawable(R.drawable.car) ));//
-		avaible_types.add(new POIType("Auto parts and accesories",new HashMap<String, String>() { { put("shop","car_parts"); } },getResources().getDrawable(R.drawable.tyres)) );//
-		avaible_types.add(new POIType("Car Rental",new HashMap<String, String>() { { put("shop","car_rental"); } },getResources().getDrawable(R.drawable.carrental)) );//
-		avaible_types.add(new POIType("Car Repair",new HashMap<String, String>() { { put("shop","car_repair"); } },getResources().getDrawable(R.drawable.repairshop)) );//
-		avaible_types.add(new POIType("Car Sharing",new HashMap<String, String>() { { put("amenity","car_sharing"); } },getResources().getDrawable(R.drawable.carsharing)) );//
-		avaible_types.add(new POIType("Car Wash",new HashMap<String, String>() { { put("amenity","car_wash"); } },getResources().getDrawable(R.drawable.carwash)) );//
-		avaible_types.add(new POIType("Fuel Station",new HashMap<String, String>() { { put("amenity","fuel"); } },getResources().getDrawable(R.drawable.fuel)) );//
-		avaible_types.add(new POIType("Parking",new HashMap<String, String>() { { put("amenity","parking"); } },getResources().getDrawable(R.drawable.parking)) );//
-		
-		avaible_types.add(new POIType("College",new HashMap<String, String>() { { put("amenity","college"); } },getResources().getDrawable(R.drawable.college)) );
-		avaible_types.add(new POIType("Kindergarten",new HashMap<String, String>() { { put("amenity","kindergarten"); } },getResources().getDrawable(R.drawable.kindergarten)) );//
-		avaible_types.add(new POIType("School",new HashMap<String, String>() { { put("amenity","school"); } },getResources().getDrawable(R.drawable.school)) );//
-		avaible_types.add(new POIType("University",new HashMap<String, String>() { { put("amenity","university"); } },getResources().getDrawable(R.drawable.university)) );//
-	    
-		avaible_types.add(new POIType("Arts centre",new HashMap<String, String>() { { put("amenity","arts_centre"); }},getResources().getDrawable(R.drawable.artscentre)) );//
-		avaible_types.add(new POIType("Artwork",new HashMap<String, String>() { { put("tourism","artwork"); } },getResources().getDrawable(R.drawable.artscentre) ) );//
-		avaible_types.add(new POIType("Cinema",new HashMap<String, String>() { { put("amenity","cinema"); } },getResources().getDrawable(R.drawable.cinema)) );//
-		avaible_types.add(new POIType("Library",new HashMap<String, String>() { { put("amenity","library"); }},getResources().getDrawable(R.drawable.library) ) );//
-		avaible_types.add(new POIType("Museum",new HashMap<String, String>() { { put("tourism","museum"); } },getResources().getDrawable(R.drawable.museum)) );//
-		avaible_types.add(new POIType("Nightclub",new HashMap<String, String>() { { put("amenity","nightclub"); }},getResources().getDrawable(R.drawable.nightclub)) );//
-		avaible_types.add(new POIType("Theatre",new HashMap<String, String>() { { put("amenity","theatre"); }},getResources().getDrawable(R.drawable.theater)) );//
-		avaible_types.add(new POIType("Theme Park",new HashMap<String, String>() { { put("amenity","theme_park"); } },getResources().getDrawable(R.drawable.themepark)) );//
-		avaible_types.add(new POIType("Water park",new HashMap<String, String>() { { put("amenity","water_park"); } },getResources().getDrawable(R.drawable.waterpark)) );//
-		avaible_types.add(new POIType("Zoo",new HashMap<String, String>() { { put("tourism","zoo"); } },getResources().getDrawable(R.drawable.zoo)) );//
-		
-		avaible_types.add(new POIType("Bakery",new HashMap<String, String>() { { put("shop","bakery"); } },getResources().getDrawable(R.drawable.bakery)) );//
-		avaible_types.add(new POIType("Cafe",new HashMap<String, String>() { { put("amenity","cafe"); } },getResources().getDrawable(R.drawable.cafe)) );//
-		avaible_types.add(new POIType("Fast Food",new HashMap<String, String>() { { put("amenity","fast_food"); } },getResources().getDrawable(R.drawable.fastfood)) );//
-		avaible_types.add(new POIType("Pub",new HashMap<String, String>() { { put("amenity","pub"); } },getResources().getDrawable(R.drawable.pub)) );//
-		avaible_types.add(new POIType("Restaurant",new HashMap<String, String>() { { put("amenity","restaurant"); } },getResources().getDrawable(R.drawable.restaurant)) );//
-		avaible_types.add(new POIType("Bar",new HashMap<String, String>() { { put("amenity","bar"); } },getResources().getDrawable(R.drawable.bar)) );//
-	    
-		avaible_types.add(new POIType("Dentist",new HashMap<String, String>() { { put("helthcare","dentist"); }},getResources().getDrawable(R.drawable.dentist) ) );//
-		avaible_types.add(new POIType("Doctor",new HashMap<String, String>() { { put("amenity","doctors"); } },getResources().getDrawable(R.drawable.doctor)) );//
-		avaible_types.add(new POIType("Hospital",new HashMap<String, String>() { { put("amenity","hospital"); }},getResources().getDrawable(R.drawable.hospital)) );//
-		avaible_types.add(new POIType("Pharmacy",new HashMap<String, String>() { { put("amenity","pharmacy"); }},getResources().getDrawable(R.drawable.pharmacy)) );//
-		avaible_types.add(new POIType("Veterinary",new HashMap<String, String>() { { put("amenity","veterinary"); }},getResources().getDrawable(R.drawable.veterinary) ) ); //
-		
-		avaible_types.add(new POIType("Adult",new HashMap<String, String>() { { put("shop","erotic"); } },getResources().getDrawable(R.drawable.erotic)) );//
-		avaible_types.add(new POIType("Alcohol",new HashMap<String, String>() { { put("shop","alcohol"); } },getResources().getDrawable(R.drawable.alcohol)) );//
-		avaible_types.add(new POIType("Bicycle",new HashMap<String, String>() { { put("shop","bicycle"); } },getResources().getDrawable(R.drawable.bicycle)) );//
-		avaible_types.add(new POIType("Books",new HashMap<String, String>() { { put("shop","books"); } },getResources().getDrawable(R.drawable.book) ));//
-		avaible_types.add(new POIType("Butcher",new HashMap<String, String>() { { put("shop","butcher"); } },getResources().getDrawable(R.drawable.butcher)) );//
-		avaible_types.add(new POIType("Clothes",new HashMap<String, String>() { { put("shop","clothes"); } },getResources().getDrawable(R.drawable.clothes)) );//
-		avaible_types.add(new POIType("Computers",new HashMap<String, String>() { { put("shop","computer"); } },getResources().getDrawable(R.drawable.computer)) );//
-		avaible_types.add(new POIType("Convinience",new HashMap<String, String>() { { put("shop","convenience"); } },getResources().getDrawable(R.drawable.convenience)) );//
-		avaible_types.add(new POIType("Electronics",new HashMap<String, String>() { { put("shop","electronics"); } },getResources().getDrawable(R.drawable.electronics)) );//
-		avaible_types.add(new POIType("Florist",new HashMap<String, String>() { { put("shop","florist"); } },getResources().getDrawable(R.drawable.florist)) );//
-		avaible_types.add(new POIType("Furniture",new HashMap<String, String>() { { put("shop","furniture"); } },getResources().getDrawable(R.drawable.furniture)) );//
-		avaible_types.add(new POIType("Sports",new HashMap<String, String>() { { put("shop","sports"); } },getResources().getDrawable(R.drawable.sports)) );//
-		avaible_types.add(new POIType("Jewelers",new HashMap<String, String>() { { put("shop","jewelry"); } },getResources().getDrawable(R.drawable.jewelry)) );//
-		avaible_types.add(new POIType("Mobile phones",new HashMap<String, String>() { { put("shop","mobile_phone"); } },getResources().getDrawable(R.drawable.mobilephone)) );//
-		avaible_types.add(new POIType("Music",new HashMap<String, String>() { { put("shop","music"); } },getResources().getDrawable(R.drawable.music)) );//
-		avaible_types.add(new POIType("Outdoor",new HashMap<String, String>() { { put("shop","outdoor"); } },getResources().getDrawable(R.drawable.outdoor)) );//
-		avaible_types.add(new POIType("Photo",new HashMap<String, String>() { { put("shop","photo"); } },getResources().getDrawable(R.drawable.photo)) );//
-		avaible_types.add(new POIType("Shoes",new HashMap<String, String>() { { put("shop","shoes"); } },getResources().getDrawable(R.drawable.shoes)) );//
-		avaible_types.add(new POIType("Sovenirs",new HashMap<String, String>() { { put("shop","gift"); } },getResources().getDrawable(R.drawable.gift)) );//
-		avaible_types.add(new POIType("Stationery",new HashMap<String, String>() { { put("shop","stationery"); } },getResources().getDrawable(R.drawable.stationery)) );//
-		avaible_types.add(new POIType("Supermarket",new HashMap<String, String>() { { put("shop","supermarket"); } },getResources().getDrawable(R.drawable.supermarket)) );//
-		avaible_types.add(new POIType("Toys",new HashMap<String, String>() { { put("shop","toys"); } },getResources().getDrawable(R.drawable.toys)) );//
-	
-		avaible_types.add(new POIType("Archery",new HashMap<String, String>() { { put("sport","archery"); } },getResources().getDrawable(R.drawable.archery)) );//
-		avaible_types.add(new POIType("Athletics",new HashMap<String, String>() { { put("sport","athletics"); } },getResources().getDrawable(R.drawable.athletics)) );//
-		avaible_types.add(new POIType("Baseball",new HashMap<String, String>() { { put("sport","baseball"); } },getResources().getDrawable(R.drawable.baseball)) );//
-		avaible_types.add(new POIType("Basketball",new HashMap<String, String>() { { put("sport","basketball"); }},getResources().getDrawable(R.drawable.basketball)) );//
-		avaible_types.add(new POIType("Boules",new HashMap<String, String>() { { put("sport","boules"); } },getResources().getDrawable(R.drawable.boule)) );//
-		avaible_types.add(new POIType("Bowls",new HashMap<String, String>() { { put("sport","bowls"); } },getResources().getDrawable(R.drawable.bowls)) );//
-		avaible_types.add(new POIType("Caone",new HashMap<String, String>() { { put("sport","canoe"); } },getResources().getDrawable(R.drawable.canoe)) );//
-		avaible_types.add(new POIType("Climbing",new HashMap<String, String>() { { put("sport","climbing"); } },getResources().getDrawable(R.drawable.hillclimbing)) );//
-		avaible_types.add(new POIType("Equestrian",new HashMap<String, String>() { { put("sport","equestrian"); } },getResources().getDrawable(R.drawable.equestrian)) );//
-		avaible_types.add(new POIType("Motor sport",new HashMap<String, String>() { { put("sport","motor"); } },getResources().getDrawable(R.drawable.motorbike)) );//
-		avaible_types.add(new POIType("Multi",new HashMap<String, String>() { { put("sport","multi"); } },getResources().getDrawable(R.drawable.multi)) );//
-		avaible_types.add(new POIType("Pitch",new HashMap<String, String>() { { put("leisure","pitch"); } },getResources().getDrawable(R.drawable.pitch)) );//
-		avaible_types.add(new POIType("Rugby",new HashMap<String, String>() { { put("sport","rugby_union"); } },getResources().getDrawable(R.drawable.football)) );//
-		avaible_types.add(new POIType("Shooting",new HashMap<String, String>() { { put("sport","shooting"); } },getResources().getDrawable(R.drawable.shooting)) );//
-		avaible_types.add(new POIType("Skateboard",new HashMap<String, String>() { { put("sport","skateboard"); } },getResources().getDrawable(R.drawable.skateboard)) );//
-		avaible_types.add(new POIType("Skating",new HashMap<String, String>() { { put("sport","skating"); } },getResources().getDrawable(R.drawable.skating)) );//
-		avaible_types.add(new POIType("Soccer",new HashMap<String, String>() { { put("sport","soccer"); } },getResources().getDrawable(R.drawable.soccer)) );//
-		avaible_types.add(new POIType("Sport Center",new HashMap<String, String>() { { put("leisure","sports_centre"); } },getResources().getDrawable(R.drawable.sportscentre)) );//
-		avaible_types.add(new POIType("Stadium",new HashMap<String, String>() { { put("leisure","stadium"); } },getResources().getDrawable(R.drawable.stadium)) );//
-		avaible_types.add(new POIType("Swiming",new HashMap<String, String>() { { put("sport","swiming"); } },getResources().getDrawable(R.drawable.swimming)) );//
-		avaible_types.add(new POIType("Table Tenis",new HashMap<String, String>() { { put("sport","table_tenis"); } },getResources().getDrawable(R.drawable.tabletennis)) );//
-		avaible_types.add(new POIType("Tenis",new HashMap<String, String>() { { put("sport","tenis"); } },getResources().getDrawable(R.drawable.tennis)) );//
-		avaible_types.add(new POIType("Track",new HashMap<String, String>() { { put("leisure","track"); } },getResources().getDrawable(R.drawable.track)) );//
-		
-		avaible_types.add(new POIType("Bicycle parking",new HashMap<String, String>() { { put("amenity","bicycle_parking"); } },getResources().getDrawable(R.drawable.bikeparking)) );//
-		avaible_types.add(new POIType("Bicycle Rental",new HashMap<String, String>() { { put("amenity","bicycle_rental"); } },getResources().getDrawable(R.drawable.bicyclerental)) );//
-		avaible_types.add(new POIType("Bus stop",new HashMap<String, String>() { { put("highway","bus_stop"); } },getResources().getDrawable(R.drawable.bus)) );//
-		avaible_types.add(new POIType("Taxi stop",new HashMap<String, String>() { { put("amenity","taxi"); } },getResources().getDrawable(R.drawable.taxi)) );//
-		avaible_types.add(new POIType("Train station",new HashMap<String, String>() { { put("building","train_station"); } },getResources().getDrawable(R.drawable.train)) );//
-		avaible_types.add(new POIType("Tram stop",new HashMap<String, String>() { { put("railway","tram_stop"); } },getResources().getDrawable(R.drawable.tram)) );//
+		this.avaible_types= new ArrayList<POIType>();
+
+        this.filt =this.initializeFiltter();
 
 
-
-		this.mode_add_poi=false;
-	    
 		ExpandableListAdapter ExpLstAdapter = new ExpandableListAdapter(this, filt);
-		
 		drawerlist.setAdapter(ExpLstAdapter);
 		
-		
 		this.load_state();
-		
-		
+
 		drawerlist.setOnChildClickListener(new OnChildClickListener() {
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v,int groupPosition, int position, long id) {
-				setTypeOfNewPOI(filt.getType(groupPosition,position));
+				setNewPOIType(filt.getType(groupPosition,position));
 				drawerlayout.closeDrawer(Gravity.LEFT);
 				return false;
 			}
@@ -436,14 +200,6 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		bd.close();
 		
 		Boolean suc=((MapView)this.findViewById(R.id.mapview)).getOverlays().remove(this.selected_marker);
-		if (suc)
-		{
-			Log.v("ui","Removed succesfuly");
-		}
-		else
-		{
-			Log.v("ui","Not removed");
-		}
 		OSMAPI api=new OSMAPI(this);
 		api.addPOI(filt.getTypes());
 		this.hideValues();
@@ -612,57 +368,43 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	protected void setMenuItemSelected(POI p,Marker marker) {
 		menu.clear();
 		getMenuInflater().inflate(R.menu.item_selected, menu);
-
+        this.actualPOI_type =p.getType();
 		this.selected_marker=marker;
-		this.showValues();
-		
-		if (p.getValue("name")!=null)
-		{
-			((EditText)this.findViewById(R.id.etName)).setText(p.getValue("name"));	
+
+        for (Field f:actualPOI_type.getFields()) {
+
+        }
+
+        this.showValues();
+		if (p.getValue("name")!=null) {
+			//((EditText)this.findViewById(R.id.etName)).setText(p.getValue("name"));
+		} else {
+			//((EditText)this.findViewById(R.id.etName)).setText("");
 		}
-		else
-		{
-			((EditText)this.findViewById(R.id.etName)).setText("");
+		if(p.getValue("address")!=null) {
+			//((EditText)this.findViewById(R.id.etAdress)).setText(p.getValue("adress"));
+		} else {
+			//((EditText)this.findViewById(R.id.etAdress)).setText("");
 		}
-		if(p.getValue("address")!=null)
-		{
-			((EditText)this.findViewById(R.id.etAdress)).setText(p.getValue("adress"));
+		if(p.getValue("website")!=null) {
+			//((EditText)this.findViewById(R.id.etWeb)).setText(p.getValue("website"));
+		} else {
+			//((EditText)this.findViewById(R.id.etWeb)).setText("");
 		}
-		else
-		{
-			((EditText)this.findViewById(R.id.etAdress)).setText("");
+		if(p.getValue("phone")!=null) {
+			//((EditText)this.findViewById(R.id.etPhone)).setText(p.getValue("phone"));
+		} else {
+			//((EditText)this.findViewById(R.id.etPhone)).setText("");
 		}
-		if(p.getValue("website")!=null)
-		{
-			((EditText)this.findViewById(R.id.etWeb)).setText(p.getValue("website"));
+		if(p.getValue("opening_hours")!=null){
+			//((EditText)this.findViewById(R.id.etHours)).setText(p.getValue("opening_hours"));
+		} else {
+			//((EditText)this.findViewById(R.id.etHours)).setText("");
 		}
-		else
-		{
-			((EditText)this.findViewById(R.id.etWeb)).setText("");	
-		}
-		if(p.getValue("phone")!=null)
-		{
-			((EditText)this.findViewById(R.id.etPhone)).setText(p.getValue("phone"));
-		}
-		else
-		{
-			((EditText)this.findViewById(R.id.etPhone)).setText("");	
-		}
-		if(p.getValue("opening_hours")!=null)
-		{
-			((EditText)this.findViewById(R.id.etHours)).setText(p.getValue("opening_hours"));
-		}
-		else
-		{
-			((EditText)this.findViewById(R.id.etHours)).setText("");
-		}
-		if(p.getValue("description")!=null)
-		{
-			((EditText)this.findViewById(R.id.etDescription)).setText(p.getValue("description"));
-		}
-		else
-		{
-			((EditText)this.findViewById(R.id.etDescription)).setText("");
+		if(p.getValue("description")!=null) {
+			//((EditText)this.findViewById(R.id.etDescription)).setText(p.getValue("description"));
+		} else {
+			//((EditText)this.findViewById(R.id.etDescription)).setText("");
 		}
 		
 
@@ -731,11 +473,10 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 			
 			@Override
 			public boolean onMarkerClick(Marker marker, MapView mapView) {
-				Log.v("bd","open");
 				BD bd=new BD(mapView.getContext());
 				POI p=bd.getPOI(Long.valueOf(marker.getTitle()),((MainActivity)mapView.getContext()).getAvaibleTypes());
-				Log.v("bd","close");
 				bd.close();
+
                 selected_marker=marker;
     			((MainActivity)mapView.getContext()).setMenuItemSelected(p,marker);
 				return false;
@@ -787,7 +528,6 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 
 	@Override
 	public boolean longPressHelper(GeoPoint p) {
-		
 		this.setModeAddPOI(true);
 		drawerlayout.openDrawer(Gravity.START);
 		this.setLatLonOfNewPOI(p.getLatitude(), p.getLongitude());
@@ -811,43 +551,37 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	            ItemizedIconOverlay<OverlayItem> layerPOIs=(ItemizedIconOverlay<OverlayItem>) map.getOverlays().get(1);
 	            HashMap<String,String> tags=new HashMap<String,String>();
 	            
-	            if (name!=null)
-	            {
+	            if (name!=null) {
 	            	tags.put("name",name );
 	            }
-	            if (address!=null)
-	            {
+	            if (address!=null) {
 	
 	            	tags.put("address",address);
 	            }
-	            if (description!=null)
-	            {
+	            if (description!=null) {
 	            	tags.put("description",description);
 	            }
-	            if (opening_hours!=null)
-	            {
+	            if (opening_hours!=null) {
 	            	tags.put("opening_hours",opening_hours);
 	            }
-	            if (phone!=null)
-	            {
+	            if (phone!=null) {
 	            	tags.put("phone",phone);
 	            }
 	            if (web!=null)
 	            {
 	            	tags.put("web",web);
 	            }
-	            Log.v("bd","open");
+
 	            BD bd=new BD(getApplicationContext());
 	            Long id=bd.getFreeId();
 	            POI p=new POI(lat,lon,tags, id, null,null,1);
-	            p.setType(this.newPOI_type);
+	            p.setType(this.actualPOI_type);
 	            //p.detect_type(avaible_types);
 	            bd.addPOI(p, "create");
 	            
 	            GeoPoint gp = new GeoPoint(lat, lon,0 );
 		        
 	            layerPOIs.addItem(new OverlayItem(name, description, gp));
-	            Log.v("bd", "close");
 	            bd.close();
 	            OSMAPI api=new OSMAPI(this);
 	            List<POI> points=new ArrayList<POI>();
@@ -873,7 +607,6 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	        MapView map=(MapView) findViewById(R.id.mapview);
 	        GeoPoint gp=new GeoPoint(loc.getLatitude(),loc.getLongitude(),0);
 	        map.getController().setCenter(gp);
-	        
 	    }
 
 	    @Override
@@ -888,7 +621,6 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 
 	    @Override
 	    public void onStatusChanged(String provider, int status, Bundle extras) {}
-
 		
 	}
 	
@@ -903,77 +635,30 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-			
-			View rootView = inflater.inflate(R.layout.fragment_values,container, false);
-			//Bundle b=this.getActivity().getIntent().getExtras();
-			Button save=(Button) rootView.findViewById(R.id.save);
-			
-			final EditText etName=(EditText)rootView.findViewById(R.id.etName);
-			final EditText etAdress=(EditText)rootView.findViewById(R.id.etAdress);
-			final EditText etDescription=(EditText)rootView.findViewById(R.id.etDescription);
-			final EditText etHours=(EditText)rootView.findViewById(R.id.etHours);
-			final EditText etPhone=(EditText)rootView.findViewById(R.id.etPhone);
-			final EditText etWeb=(EditText)rootView.findViewById(R.id.etWeb);
-
-            etHours.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(final View vi, boolean hasFocus) {
-                    if (hasFocus)
-                    {
-                        FieldHour d = new FieldHour(vi.getContext(), ((EditText) vi).getText().toString());
-                        d.onOK(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ((EditText) vi).setText((String) v.getTag());
-                            }
-                        });
-                        d.show();
+            View rootView = inflater.inflate(R.layout.fragment_values,container, false);
+            MainActivity m=(MainActivity)rootView.getContext();
+            //Redefinir per actual poi
+            if (m.getNewPOIType()!=null) {
+                List<Field> fields = m.getNewPOIType().getFields();
+                Field f;
+                if (fields!=null) {
+                    for (int x = fields.size()-1; x >=0; x--) {
+                        f = fields.get(x);
+                        f.addView(this.getActivity(), (ViewGroup) rootView);
                     }
                 }
-            });
+                Button save = (Button) rootView.findViewById(R.id.save);
+                save.setOnClickListener(new View.OnClickListener() {
 
-			save.setOnClickListener(new View.OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					HashMap<String,String> values=new HashMap<String,String>();
-					
-					if (! etName.getText().toString().equalsIgnoreCase(""))
-					{
-						values.put("name", etName.getText().toString());
-						etName.setText("");
-					}
-					if (! etAdress.getText().toString().equalsIgnoreCase(""))
-					{
-						values.put("address", etAdress.getText().toString());
-						etAdress.setText("");
-					}
-					if (! etDescription.getText().toString().equalsIgnoreCase(""))
-					{
-						values.put("description",etDescription.getText().toString());
-						etDescription.setText("");
-					}
-					if (! etHours.getText().toString().equalsIgnoreCase(""))
-					{
-						values.put("opening_hours",etHours.getText().toString());
-						etHours.setText("");
-					}
-					if (! etPhone.getText().toString().equalsIgnoreCase(""))
-					{
-						values.put("phone", etPhone.getText().toString());
-						etPhone.setText("");
-					}
-					if (! etWeb.getText().toString().equalsIgnoreCase(""))
-					{
-						values.put("web", etWeb.getText().toString());
-						etWeb.setText("");
-					}
-					mCallback.setValuesOfNewPOI(values);
-					mCallback.hideValues();
-					mCallback.createNewPOI();
-				}
-			});
-			
+                    @Override
+                    public void onClick(View v) {
+                        HashMap<String, String> values = new HashMap<String, String>();
+                        mCallback.setValuesOfNewPOI(values);
+                        mCallback.hideValues();
+                        mCallback.createNewPOI();
+                    }
+                });
+            }
 			return rootView;
 		}
 		@Override
@@ -991,8 +676,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		}
 	}
 	
-	public void follow()
-	{
+	public void follow() {
 		locationmanager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,bll);
 		
 	}
@@ -1000,13 +684,12 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	{
 		locationmanager.removeUpdates(bll);
 	}
-	public void showValues()
-	{
+	public void showValues() {
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame_values, new PlaceholderFragmentValue()).commit();
 		FrameLayout frame_values = (FrameLayout) findViewById(R.id.frame_values);
 		frame_values.setVisibility(View.VISIBLE);
 		drawerlayout.closeDrawers();
 		this.values_visible=true;
-		
 	}
 	public Boolean getModeAddPOI()
 	{
@@ -1016,32 +699,30 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	{
 		this.mode_add_poi=value;
 	}
-	protected void setLatLonOfNewPOI(double lat,double lon)
-	{
+	protected void setLatLonOfNewPOI(double lat,double lon) {
 		this.newPOI_lat=lat;
 		this.newPOI_lon=lon;
 	}
 	protected void setValuesOfNewPOI(HashMap<String, String> values) {
 		this.newPOI_values=values;
 	}
-	protected void setTypeOfNewPOI(POIType type)
+	protected void setNewPOIType(POIType type)
 	{
-		this.newPOI_type=type;
+		this.actualPOI_type=type;
 	}
+    protected  POIType getNewPOIType()
+    {
+        return this.actualPOI_type;
+    }
 
-	protected void createNewPOI()
-	{
+	protected void createNewPOI() {
+
 		MapView map=(MapView)this.findViewById(R.id.mapview);
 		BD bd=new BD(this);
-		Log.v("bd","open");
         Long id=bd.getFreeId();
         POI p=new POI(this.newPOI_lat,this.newPOI_lon,this.newPOI_values, id, null,null,1);
-        p.setType(this.newPOI_type);
-
-        Log.v("bd", "id new poi->"+String.valueOf(id));
-
+        p.setType(this.actualPOI_type);
         bd.addPOI(p, "created");
-        Log.v("bd", "close");
         bd.close();
         
 
@@ -1069,6 +750,10 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	        	this.hideValues();
 	        	return true;
 	        }
+            else if (drawerlayout.isDrawerOpen(GravityCompat.START)) {
+                drawerlayout.closeDrawer(Gravity.LEFT);
+                return false;
+            }
 	    }
 	    return super.onKeyDown(keyCode, event);
 	}
@@ -1076,9 +761,8 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	public void onStop()
 	{
 		super.onStop();
-		
+
 		this.save_state();
-		
 	}
 
 	private void save_state() {
@@ -1091,7 +775,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	}
 
 	public void setTypeOfNewPOI(String  groupName, Integer second) {
-		this.newPOI_type=filt.getType(groupName, second);
+		this.actualPOI_type=filt.getType(groupName, second);
 	}
 	public void changeFilter(String groupName, Integer second, boolean checked) {
 		POIType t=filt.getType(groupName, second);
@@ -1112,24 +796,16 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	}
 
 	@Override
-	public void onMarkerDrag(Marker marker) {
-		
-		Log.v("Drag", "Mig");
-	}
+	public void onMarkerDrag(Marker marker) {}
 
 	@Override
 	public void onMarkerDragEnd(Marker marker) {
 		MapView map=((MapView)this.findViewById(R.id.mapview));
-		
 		map.getOverlays().remove(this.marker_drag);
-		//map.invalidate();
-		Log.v("Drag", "End");
 		map.getOverlays().add(marker);
 		BD bd=new BD(this);
-		Log.v("bd", "open");
 		POI p= bd.getPOI(Long.valueOf(marker.getTitle()), filt.getTypes());
 		p.setGeoPoint(marker.getPosition());
-		Log.v("bd", "close");
 		bd.updatePOI(p);
 		bd.close();
 		OSMAPI api=new OSMAPI(this);
@@ -1139,7 +815,6 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 
 	@Override
 	public void onMarkerDragStart(Marker marker) {
-		Log.v("Drag", "Start");
 		Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
 		v.vibrate(100);
 		this.marker_drag=marker;
@@ -1150,18 +825,14 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		List<Overlay> overlay_list =((MapView)this.findViewById(R.id.mapview)).getOverlays();
 		int x;
 		Marker tmp;
-		for (POI p:outdated_pois)
-		{
-			if( p.getStatus().equalsIgnoreCase("created"))
-			{
+		for (POI p:outdated_pois) {
+			if( p.getStatus().equalsIgnoreCase("created")) {
 
 				x=1;
-				while (x<overlay_list.size() &&(Long.valueOf(((Marker)overlay_list.get(x)).getTitle())!=(-1*p.getId())))
-				{
+				while (x<overlay_list.size() &&(Long.valueOf(((Marker)overlay_list.get(x)).getTitle())!=(-1*p.getId()))) {
 					x++;
 				}
-				if ((x<overlay_list.size()) && (Long.valueOf(((Marker)overlay_list.get(x)).getTitle())==(-1*p.getId())))
-				{
+				if ((x<overlay_list.size()) && (Long.valueOf(((Marker)overlay_list.get(x)).getTitle())==(-1*p.getId()))) {
 						tmp=(Marker) overlay_list.get(x);
 						tmp.setTitle(p.getOsmId().toString());
 						((MapView)this.findViewById(R.id.mapview)).getOverlays().set(x, tmp);
@@ -1173,10 +844,353 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	{
 		return this.filt;
 	}
-	public static void end()
-	{
+	public static void end() {
 		
 		
 	}
+    private void addAvaibleType(POIType t) {
+        this.avaible_types.add(t);
+    }
+    private Filter initializeFiltter() {
+        Filter filt=new Filter();
+        filt.clearGroups();
+        List<Field> default_fields= new ArrayList<Field>();
+        default_fields.add(new Field(this,this.getResources().getString(R.string.name),"name"));
+        default_fields.add(new Field(this,this.getResources().getString(R.string.adress),"adress"));
+        default_fields.add(new Field(this,this.getResources().getString(R.string.web),"website"));
+        default_fields.add(new Field(this,this.getResources().getString(R.string.phone),"phone"));
+        default_fields.add(new Field(this,this.getResources().getString(R.string.opening_hours),"opening_hours"));
+        default_fields.add(new Field(this,this.getResources().getString(R.string.description),"description"));
+
+
+        POIType atm = new POIType("ATM",new HashMap<String, String>() { { put("amenity","atm"); } },getResources().getDrawable( R.drawable.atm ) );
+        atm.setFields(default_fields);
+        POIType bank = new POIType("Bank",new HashMap<String, String>() { { put("amenity","bank"); } },getResources().getDrawable(R.drawable.bank)) ;
+        bank.setFields(default_fields);
+        POIType drinking_water = new POIType("Drinking water",new HashMap<String, String>() { { put("amenity","drinking_water");}},getResources().getDrawable(R.drawable.drinkingwater) );
+        drinking_water.setFields(default_fields);
+        POIType hair_dresser = new POIType("Hair Dressser",new HashMap<String, String>() { { put("shop","hairdresser"); } },getResources().getDrawable(R.drawable.hairdresser));
+        hair_dresser.setFields(default_fields);
+        POIType laundary = new POIType("Laundry",new HashMap<String, String>() { { put("shop","laundry"); } },getResources().getDrawable(R.drawable.laundry));
+        laundary.setFields(default_fields);
+        POIType post_box = new POIType("Post Box",new HashMap<String, String>() { { put("amenity","post_box"); } },getResources().getDrawable(R.drawable.postbox) );
+        post_box.setFields(default_fields);
+        POIType post_office = new POIType("Post Office",new HashMap<String, String>() { { put("amenity","post_office"); } },getResources().getDrawable(R.drawable.postoffice));
+        post_office.setFields(default_fields);
+        POIType public_toilets= new POIType("Public Toilets",new HashMap<String, String>() { { put("amenity","toilets"); } },getResources().getDrawable(R.drawable.toilets));
+        public_toilets.setFields(default_fields);
+        POIType recycling = new POIType("Recycling",new HashMap<String, String>() { { put("amenity","recycling"); } },getResources().getDrawable(R.drawable.recycling));
+        recycling.setFields(default_fields);
+        POIType survillance = new POIType("Surveillance",new HashMap<String, String>() { { put("amenity","surveillance"); } },getResources().getDrawable(R.drawable.surveillance));
+        survillance.setFields(default_fields);
+        POIType phone = new POIType("Phone",new HashMap<String, String>() { { put("amenity","telephone"); } },getResources().getDrawable(R.drawable.telephone));
+        phone.setFields(default_fields);
+        filt.addGroup("Services",Arrays.asList(atm, bank, drinking_water,hair_dresser,laundary,post_box,post_office,public_toilets,recycling,survillance,phone)) ;
+
+
+        POIType town_hall = new POIType("Town Hall",new HashMap<String, String>() { { put("amenity","townhall"); } },getResources().getDrawable(R.drawable.townhall));
+        town_hall.setFields(default_fields);
+        POIType fire_station = new POIType("Fire Station",new HashMap<String, String>() { { put("amenity","fire_station"); } },getResources().getDrawable(R.drawable.firestation));
+        fire_station.setFields(default_fields);
+        POIType police = new POIType("Police",new HashMap<String, String>() { { put("amenity","police"); } },getResources().getDrawable(R.drawable.police));
+        police.setFields(default_fields);
+        POIType prision = new POIType("Police",new HashMap<String, String>() { { put("amenity","police"); } },getResources().getDrawable(R.drawable.police)) ;
+        prision.setFields(default_fields);
+        filt.addGroup("Goverment", Arrays.asList(town_hall,fire_station,police,prision));
+
+        POIType auto_dealer = new POIType("Auto dealer",new HashMap<String, String>() { { put("shop","car"); } },getResources().getDrawable(R.drawable.car) );
+        auto_dealer.setFields(default_fields);
+        POIType car_parts = new POIType("Auto parts and accesories",new HashMap<String, String>() { { put("shop","car_parts"); } },getResources().getDrawable(R.drawable.tyres));
+        car_parts.setFields(default_fields);
+        POIType car_rental = new POIType("Car Rental",new HashMap<String, String>() { { put("shop","car_rental"); } },getResources().getDrawable(R.drawable.carrental));
+        car_rental.setFields(default_fields);
+        POIType car_repair = new POIType("Car Repair",new HashMap<String, String>() { { put("shop","car_repair"); } },getResources().getDrawable(R.drawable.repairshop)) ;
+        car_repair.setFields(default_fields);
+        POIType car_sharing = new POIType("Car Sharing",new HashMap<String, String>() { { put("amenity","car_sharing"); } },getResources().getDrawable(R.drawable.carsharing));
+        car_sharing.setFields(default_fields);
+        POIType car_wash = new POIType("Car Wash",new HashMap<String, String>() { { put("amenity","car_wash"); } },getResources().getDrawable(R.drawable.carwash));
+        car_wash.setFields(default_fields);
+        POIType fuel_station = new POIType("Fuel Station",new HashMap<String, String>() { { put("amenity","fuel"); } },getResources().getDrawable(R.drawable.fuel));
+        fuel_station.setFields(default_fields);
+        POIType parking = new POIType("Parking",new HashMap<String, String>() { { put("amenity","parking"); } },getResources().getDrawable(R.drawable.parking));
+        parking.setFields(default_fields);
+        filt.addGroup("Car", Arrays.asList(auto_dealer,car_rental,car_parts,car_repair,car_sharing,car_wash,fuel_station,parking));
+
+        POIType collage = new POIType("College",new HashMap<String, String>() { { put("amenity","college"); } },getResources().getDrawable(R.drawable.college));
+        collage.setFields(default_fields);
+        POIType kindergarten = new POIType("Kindergarten",new HashMap<String, String>() { { put("amenity","kindergarten"); } },getResources().getDrawable(R.drawable.kindergarten));
+        kindergarten.setFields(default_fields);
+        POIType school = new POIType("School",new HashMap<String, String>() { { put("amenity","school"); } },getResources().getDrawable(R.drawable.school));
+        school.setFields(default_fields);
+        POIType university = new POIType("University",new HashMap<String, String>() { { put("amenity","university"); } },getResources().getDrawable(R.drawable.university));
+        university.setFields(default_fields);
+        filt.addGroup("Education", Arrays.asList(collage,kindergarten,school,university));
+
+        POIType arts_centre = new POIType("Arts centre",new HashMap<String, String>() { { put("amenity","arts_centre"); }},getResources().getDrawable(R.drawable.artscentre));
+        arts_centre.setFields(default_fields);
+        POIType artwork = new POIType("Artwork",new HashMap<String, String>() { { put("tourism","artwork"); } },getResources().getDrawable(R.drawable.artscentre));
+        artwork.setFields(default_fields);
+        POIType cinema = new POIType("Cinema",new HashMap<String, String>() { { put("amenity","cinema"); } },getResources().getDrawable(R.drawable.cinema));
+        cinema.setFields(default_fields);
+        POIType library = new POIType("Library",new HashMap<String, String>() { { put("amenity","library"); }},getResources().getDrawable(R.drawable.library));
+        library.setFields(default_fields);
+        POIType museum = new POIType("Museum",new HashMap<String, String>() { { put("tourism","museum"); } },getResources().getDrawable(R.drawable.museum));
+        museum.setFields(default_fields);
+        POIType nightclub = new POIType("Nightclub",new HashMap<String, String>() { { put("amenity","nightclub"); }},getResources().getDrawable(R.drawable.nightclub));
+        nightclub.setFields(default_fields);
+        POIType theatre = new POIType("Theatre",new HashMap<String, String>() { { put("amenity","theatre"); }},getResources().getDrawable(R.drawable.theater));
+        theatre.setFields(default_fields);
+        POIType theme_park= new POIType("Theme Park",new HashMap<String, String>() { { put("amenity","theme_park"); } },getResources().getDrawable(R.drawable.themepark));
+        theme_park.setFields(default_fields);
+        POIType water_park= new POIType("Water park",new HashMap<String, String>() { { put("amenity","water_park"); } },getResources().getDrawable(R.drawable.waterpark));
+        water_park.setFields(default_fields);
+        POIType zoo = new POIType("Zoo",new HashMap<String, String>() { { put("tourism","zoo"); } },getResources().getDrawable(R.drawable.zoo));
+        zoo.setFields(default_fields);
+        filt.addGroup("Entretainment", Arrays.asList(arts_centre,artwork,cinema,library,museum,nightclub,theatre,theme_park,water_park,zoo));
+
+        POIType bakery =  new POIType("Bakery",new HashMap<String, String>() { { put("shop","bakery"); } },getResources().getDrawable(R.drawable.bakery));
+        bakery.setFields(default_fields);
+        POIType cafe = new POIType("Cafe",new HashMap<String, String>() { { put("amenity","cafe"); } },getResources().getDrawable(R.drawable.cafe));
+        cafe.setFields(default_fields);
+        POIType fast_food = new POIType("Fast Food",new HashMap<String, String>() { { put("amenity","fast_food"); } },getResources().getDrawable(R.drawable.fastfood));
+        fast_food.setFields(default_fields);
+        POIType pub= new POIType("Pub",new HashMap<String, String>() { { put("amenity","pub"); } },getResources().getDrawable(R.drawable.pub));
+        pub.setFields(default_fields);
+        POIType restaurant = new POIType("Restaurant",new HashMap<String, String>() { { put("amenity","restaurant"); } },getResources().getDrawable(R.drawable.restaurant));
+        restaurant.setFields(default_fields);
+        POIType bar = new POIType("Bar",new HashMap<String, String>() { { put("amenity","bar"); } },getResources().getDrawable(R.drawable.bar));
+        bar.setFields(default_fields);
+        filt.addGroup("Food and drinks", Arrays.asList(bakery,cafe,fast_food,pub,restaurant,bar));
+
+        POIType dentist =new POIType("Dentist",new HashMap<String, String>() { { put("helthcare","dentist"); }},getResources().getDrawable(R.drawable.dentist));
+        dentist.setFields(default_fields);
+        POIType doctor = new POIType("Doctor",new HashMap<String, String>() { { put("amenity","doctors"); } },getResources().getDrawable(R.drawable.doctor));
+        doctor.setFields(default_fields);
+        POIType hospital = new POIType("Hospital",new HashMap<String, String>() { { put("amenity","hospital"); }},getResources().getDrawable(R.drawable.hospital));
+        hospital.setFields(default_fields);
+        POIType pharmacy =  new POIType("Pharmacy",new HashMap<String, String>() { { put("amenity","pharmacy"); }},getResources().getDrawable(R.drawable.pharmacy));
+        pharmacy.setFields(default_fields);
+        POIType veterinary = new POIType("Veterinary",new HashMap<String, String>() { { put("amenity","veterinary"); }},getResources().getDrawable(R.drawable.veterinary));
+        veterinary.setFields(default_fields);
+        filt.addGroup("Health care & Vet", Arrays.asList(dentist,doctor,hospital,pharmacy,veterinary));
+
+        POIType adult = new POIType("Adult",new HashMap<String, String>() { { put("shop","erotic"); } },getResources().getDrawable(R.drawable.erotic));
+        adult.setFields(default_fields);
+        POIType alcohol = new POIType("Alcohol",new HashMap<String, String>() { { put("shop","alcohol"); } },getResources().getDrawable(R.drawable.alcohol));
+        alcohol.setFields(default_fields);
+        POIType bicycle = new POIType("Bicycle",new HashMap<String, String>() { { put("shop","bicycle"); } },getResources().getDrawable(R.drawable.bicycle));
+        bicycle.setFields(default_fields);
+        POIType books =  new POIType("Books",new HashMap<String, String>() { { put("shop","books"); } },getResources().getDrawable(R.drawable.book));
+        books.setFields(default_fields);
+        POIType butcher= new POIType("Butcher",new HashMap<String, String>() { { put("shop","butcher"); } },getResources().getDrawable(R.drawable.butcher));
+        butcher.setFields(default_fields);
+        POIType clothes = new POIType("Clothes",new HashMap<String, String>() { { put("shop","clothes"); } },getResources().getDrawable(R.drawable.clothes));
+        clothes.setFields(default_fields);
+        POIType computers = new POIType("Computers",new HashMap<String, String>() { { put("shop","computer"); } },getResources().getDrawable(R.drawable.computer));
+        computers.setFields(default_fields);
+        POIType convinience = new POIType("Convinience",new HashMap<String, String>() { { put("shop","convenience"); } },getResources().getDrawable(R.drawable.convenience));
+        convinience.setFields(default_fields);
+        POIType electronics = new POIType("Electronics",new HashMap<String, String>() { { put("shop","electronics"); } },getResources().getDrawable(R.drawable.electronics));
+        electronics.setFields(default_fields);
+        POIType florist = new POIType("Florist",new HashMap<String, String>() { { put("shop","florist"); } },getResources().getDrawable(R.drawable.florist));
+        florist.setFields(default_fields);
+        POIType furniture = new POIType("Furniture",new HashMap<String, String>() { { put("shop","furniture"); } },getResources().getDrawable(R.drawable.furniture));
+        furniture.setFields(default_fields);
+        POIType sports = new POIType("Sports",new HashMap<String, String>() { { put("shop","sports"); } },getResources().getDrawable(R.drawable.sports));
+        sports.setFields(default_fields);
+        POIType jewelers =new POIType("Jewelers",new HashMap<String, String>() { { put("shop","jewelry"); } },getResources().getDrawable(R.drawable.jewelry));
+        jewelers.setFields(default_fields);
+        POIType mobile = new POIType("Mobile phones",new HashMap<String, String>() { { put("shop","mobile_phone"); } },getResources().getDrawable(R.drawable.mobilephone));
+        mobile.setFields(default_fields);
+        POIType music = new POIType("Music",new HashMap<String, String>() { { put("shop","music"); } },getResources().getDrawable(R.drawable.music));
+        music.setFields(default_fields);
+        POIType outdoor= new POIType("Outdoor",new HashMap<String, String>() { { put("shop","outdoor"); } },getResources().getDrawable(R.drawable.outdoor));
+        outdoor.setFields(default_fields);
+        POIType photo = new POIType("Photo",new HashMap<String, String>() { { put("shop","photo"); } },getResources().getDrawable(R.drawable.photo));
+        photo.setFields(default_fields);
+        POIType shoes= new POIType("Shoes",new HashMap<String, String>() { { put("shop","shoes"); } },getResources().getDrawable(R.drawable.shoes));
+        shoes.setFields(default_fields);
+        POIType souvenirs =  new POIType("Sovenirs",new HashMap<String, String>() { { put("shop","gift"); } },getResources().getDrawable(R.drawable.gift));
+        souvenirs.setFields(default_fields);
+        POIType stationery=new POIType("Stationery",new HashMap<String, String>() { { put("shop","stationery"); } },getResources().getDrawable(R.drawable.stationery));
+        stationery.setFields(default_fields);
+        POIType supermarket= new POIType("Supermarket",new HashMap<String, String>() { { put("shop","supermarket"); } },getResources().getDrawable(R.drawable.supermarket));
+        supermarket.setFields(default_fields);
+        POIType toys= new POIType("Toys",new HashMap<String, String>() { { put("shop","toys"); } },getResources().getDrawable(R.drawable.toys));
+        toys.setFields(default_fields);
+        filt.addGroup("Shoping", Arrays.asList(adult,alcohol,bicycle,books,butcher,clothes,computers,convinience,electronics,florist,furniture,sports,jewelers,mobile,music,outdoor,photo,shoes,souvenirs,stationery,supermarket,toys));
+
+
+        POIType archery=new POIType("Archery",new HashMap<String, String>() { { put("sport","archery"); } },getResources().getDrawable(R.drawable.archery));
+        archery.setFields(default_fields);
+        POIType athletics=new POIType("Athletics",new HashMap<String, String>() { { put("sport","athletics"); } },getResources().getDrawable(R.drawable.athletics));
+        athletics.setFields(default_fields);
+        POIType baseball = new POIType("Baseball",new HashMap<String, String>() { { put("sport","baseball"); } },getResources().getDrawable(R.drawable.baseball));
+        baseball.setFields(default_fields);
+        POIType basketball= new POIType("Basketball",new HashMap<String, String>() { { put("sport","basketball"); }},getResources().getDrawable(R.drawable.basketball));
+        basketball.setFields(default_fields);
+        POIType boules= new POIType("Boules",new HashMap<String, String>() { { put("sport","boules"); } },getResources().getDrawable(R.drawable.boule));
+        boules.setFields(default_fields);
+        POIType bowls= new POIType("Bowls",new HashMap<String, String>() { { put("sport","bowls"); } },getResources().getDrawable(R.drawable.bowls));
+        bowls.setFields(default_fields);
+        POIType canoe = new POIType("Caone",new HashMap<String, String>() { { put("sport","canoe"); } },getResources().getDrawable(R.drawable.canoe));
+        canoe.setFields(default_fields);
+        POIType climbing = new POIType("Climbing",new HashMap<String, String>() { { put("sport","climbing"); } },getResources().getDrawable(R.drawable.hillclimbing));
+        climbing.setFields(default_fields);
+        POIType equestrian = new POIType("Equestrian",new HashMap<String, String>() { { put("sport","equestrian"); } },getResources().getDrawable(R.drawable.equestrian));
+        equestrian.setFields(default_fields);
+        POIType motor_sport = new POIType("Motor sport",new HashMap<String, String>() { { put("sport","motor"); } },getResources().getDrawable(R.drawable.motorbike));
+        motor_sport.setFields(default_fields);
+        POIType multi= new POIType("Multi",new HashMap<String, String>() { { put("sport","multi"); } },getResources().getDrawable(R.drawable.multi));
+        multi.setFields(default_fields);
+        POIType pitch = new POIType("Pitch",new HashMap<String, String>() { { put("leisure","pitch"); } },getResources().getDrawable(R.drawable.pitch));
+        pitch.setFields(default_fields);
+        POIType rugby= new POIType("Rugby",new HashMap<String, String>() { { put("sport","rugby_union"); } },getResources().getDrawable(R.drawable.football));
+        rugby.setFields(default_fields);
+        POIType shooting= new POIType("Shooting",new HashMap<String, String>() { { put("sport","shooting"); } },getResources().getDrawable(R.drawable.shooting));
+        shooting.setFields(default_fields);
+        POIType skateboard= new POIType("Skateboard",new HashMap<String, String>() { { put("sport","skateboard"); } },getResources().getDrawable(R.drawable.skateboard));
+        skateboard.setFields(default_fields);
+        POIType skating=new POIType("Skating",new HashMap<String, String>() { { put("sport","skating"); } },getResources().getDrawable(R.drawable.skating));
+        skating.setFields(default_fields);
+        POIType soccer= new POIType("Soccer",new HashMap<String, String>() { { put("sport","soccer"); } },getResources().getDrawable(R.drawable.soccer));
+        soccer.setFields(default_fields);
+        POIType sport_center= new POIType("Sport Center",new HashMap<String, String>() { { put("leisure","sports_centre"); } },getResources().getDrawable(R.drawable.sportscentre));
+        sport_center.setFields(default_fields);
+        POIType stadium=new POIType("Stadium",new HashMap<String, String>() { { put("leisure","stadium"); } },getResources().getDrawable(R.drawable.stadium));
+        stadium.setFields(default_fields);
+        POIType swing= new POIType("Stadium",new HashMap<String, String>() { { put("leisure","stadium"); } },getResources().getDrawable(R.drawable.stadium));
+        swing.setFields(default_fields);
+        POIType table_tenis= new POIType("Table Tenis",new HashMap<String, String>() { { put("sport","table_tenis"); } },getResources().getDrawable(R.drawable.tabletennis));
+        table_tenis.setFields(default_fields);
+        POIType tenis = new POIType("Tenis",new HashMap<String, String>() { { put("sport","tenis"); } },getResources().getDrawable(R.drawable.tennis));
+        tenis.setFields(default_fields);
+        POIType track =new POIType("Track",new HashMap<String, String>() { { put("leisure","track"); } },getResources().getDrawable(R.drawable.track));
+        track.setFields(default_fields);
+        filt.addGroup("Sport",Arrays.asList(archery,athletics,baseball,basketball,boules,bowls,canoe,climbing,equestrian,motor_sport,multi,pitch,shooting,skateboard,skating,soccer,stadium,sport_center,swing,table_tenis));
+
+        POIType bicycle_parking=new POIType("Bicycle parking",new HashMap<String, String>() { { put("amenity","bicycle_parking"); } },getResources().getDrawable(R.drawable.bikeparking));
+        bicycle_parking.setFields(default_fields);
+        POIType bicycle_rental=new POIType("Bicycle Rental",new HashMap<String, String>() { { put("amenity","bicycle_rental"); } },getResources().getDrawable(R.drawable.bicyclerental));
+        bicycle_rental.setFields(default_fields);
+        POIType bus_stop=new POIType("Bus stop",new HashMap<String, String>() { { put("highway","bus_stop"); } },getResources().getDrawable(R.drawable.bus));
+        bus_stop.setFields(default_fields);
+        POIType taxi_stop = new POIType("Taxi stop",new HashMap<String, String>() { { put("amenity","taxi"); } },getResources().getDrawable(R.drawable.taxi));
+        taxi_stop.setFields(default_fields);
+        POIType train_stop= new POIType("Train station",new HashMap<String, String>() { { put("building","train_station"); } },getResources().getDrawable(R.drawable.train));
+        train_stop.setFields(default_fields);
+        POIType tram_stop= new POIType("Tram stop",new HashMap<String, String>() { { put("railway","tram_stop"); } },getResources().getDrawable(R.drawable.tram));
+        tram_stop.setFields(default_fields);
+        filt.addGroup("Transport", Arrays.asList(bicycle_parking,bicycle_rental,bus_stop,taxi_stop,train_stop,tram_stop));
+
+        //Add avaible types
+
+        this.avaible_types=new ArrayList<POIType>();
+        this.addAvaibleType(atm);
+        this.addAvaibleType(bank);
+        this.addAvaibleType(drinking_water);
+        this.addAvaibleType(hair_dresser);
+        this.addAvaibleType(laundary);
+        this.addAvaibleType(post_box);
+        this.addAvaibleType(post_office);
+        this.addAvaibleType(public_toilets);
+        this.addAvaibleType(recycling);
+        this.addAvaibleType(survillance);
+        this.addAvaibleType(phone);
+
+        this.addAvaibleType(town_hall);
+        this.addAvaibleType(fire_station);
+        this.addAvaibleType(police);
+        this.addAvaibleType(prision);
+
+        this.addAvaibleType(auto_dealer);
+        this.addAvaibleType(car_parts);
+        this.addAvaibleType(car_rental);
+        this.addAvaibleType(car_repair);
+        this.addAvaibleType(car_sharing);
+        this.addAvaibleType(car_wash);
+        this.addAvaibleType(fuel_station);
+        this.addAvaibleType(parking);
+
+        this.addAvaibleType(collage);
+        this.addAvaibleType(kindergarten);
+        this.addAvaibleType(school);
+        this.addAvaibleType(university);
+
+        this.addAvaibleType(arts_centre);
+        this.addAvaibleType(artwork);
+        this.addAvaibleType(cinema);
+        this.addAvaibleType(library);
+        this.addAvaibleType(museum);
+        this.addAvaibleType(nightclub);
+        this.addAvaibleType(theatre);
+        this.addAvaibleType(theme_park);
+        this.addAvaibleType(water_park);
+        this.addAvaibleType(zoo);
+
+        this.addAvaibleType(bakery);
+        this.addAvaibleType(cafe);
+        this.addAvaibleType(fast_food);
+        this.addAvaibleType(pub);
+        this.addAvaibleType(restaurant);
+        this.addAvaibleType(bar);
+
+        this.addAvaibleType(dentist);
+        this.addAvaibleType(doctor);
+        this.addAvaibleType(hospital);
+        this.addAvaibleType(pharmacy);
+        this.addAvaibleType(veterinary);
+
+        this.addAvaibleType(adult);
+        this.addAvaibleType(alcohol);
+        this.addAvaibleType(bicycle);
+        this.addAvaibleType(books);
+        this.addAvaibleType(butcher);
+        this.addAvaibleType(clothes);
+        this.addAvaibleType(computers);
+        this.addAvaibleType(convinience);
+        this.addAvaibleType(electronics);
+        this.addAvaibleType(florist);
+        this.addAvaibleType(furniture);
+        this.addAvaibleType(sports);
+        this.addAvaibleType(jewelers);
+        this.addAvaibleType(mobile);
+        this.addAvaibleType(music);
+        this.addAvaibleType(outdoor);
+        this.addAvaibleType(photo);
+        this.addAvaibleType(shoes);
+        this.addAvaibleType(souvenirs);
+        this.addAvaibleType(stationery);
+        this.addAvaibleType(toys);
+
+        this.addAvaibleType(archery);
+        this.addAvaibleType(athletics);
+        this.addAvaibleType(baseball);
+        this.addAvaibleType(boules);
+        this.addAvaibleType(canoe);
+        this.addAvaibleType(climbing);
+        this.addAvaibleType(equestrian);
+        this.addAvaibleType(motor_sport);
+        this.addAvaibleType(multi);
+        this.addAvaibleType(pitch);
+        this.addAvaibleType(rugby);
+        this.addAvaibleType(shooting);
+        this.addAvaibleType(skateboard);
+        this.addAvaibleType(soccer);
+        this.addAvaibleType(sport_center);
+        this.addAvaibleType(swing);
+        this.addAvaibleType(table_tenis);
+        this.addAvaibleType(tenis);
+        this.addAvaibleType(track);
+
+        this.addAvaibleType(bicycle_parking);
+        this.addAvaibleType(bicycle_rental);
+        this.addAvaibleType(bus_stop);
+        this.addAvaibleType(taxi_stop);
+        this.addAvaibleType(train_stop);
+        this.addAvaibleType(tram_stop);
+
+        return filt;
+    }
 }
 

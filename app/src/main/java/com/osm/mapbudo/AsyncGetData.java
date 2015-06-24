@@ -75,16 +75,12 @@ public class AsyncGetData extends AsyncTask<List<Pair<String,String>>, Object, L
 					    	points.add(new POI(poi_nodes.item(x)));
 					    }
 					 	return points;
-					 }
-					 else
-					 {
+					 } else {
 						 Log.v("tag",String.valueOf( response.getStatusLine().getStatusCode()));
 						 return null;
 					 }
 				}
-			}
-			else
-			{
+			} else {
 				return points;
 			}
 		}
@@ -95,9 +91,6 @@ public class AsyncGetData extends AsyncTask<List<Pair<String,String>>, Object, L
 	}
 	@Override
 	protected void onPostExecute(List<POI> result) {
-		
-		
-		Log.v("bd", "open");
 		BD bd=new BD(this.context);
 		if (result!=null)
 		{
@@ -111,7 +104,6 @@ public class AsyncGetData extends AsyncTask<List<Pair<String,String>>, Object, L
 				}
 			}
 		}
-		Log.v("bd","close");
 		bd.close();
 		((MainActivity)this.context).active_get=false;
 	}
@@ -119,8 +111,7 @@ public class AsyncGetData extends AsyncTask<List<Pair<String,String>>, Object, L
 	{
 		this.context=c;
 	}
-	public void setPOITypes(List<POIType> avaible_types)
-	{
+	public void setPOITypes(List<POIType> avaible_types) {
 		this.avaible_types=avaible_types;
 	}
 	
