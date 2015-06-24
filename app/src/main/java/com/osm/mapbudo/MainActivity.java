@@ -642,74 +642,17 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
                 List<Field> fields = m.getNewPOIType().getFields();
                 Field f;
                 if (fields!=null) {
-                    for (int x = 0; x < fields.size(); x++) {
+                    for (int x = fields.size()-1; x >=0; x--) {
                         f = fields.get(x);
                         f.addView(this.getActivity(), (ViewGroup) rootView);
                     }
                 }
-
                 Button save = (Button) rootView.findViewById(R.id.save);
-			
-			/*final EditText etName=(EditText)rootView.findViewById(R.id.etName);
-			final EditText etAdress=(EditText)rootView.findViewById(R.id.etAdress);
-			final EditText etDescription=(EditText)rootView.findViewById(R.id.etDescription);
-			final EditText etHours=(EditText)rootView.findViewById(R.id.etHours);
-			final EditText etPhone=(EditText)rootView.findViewById(R.id.etPhone);
-			final EditText etWeb=(EditText)rootView.findViewById(R.id.etWeb);*/
-
-            /*etHours.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(final View vi, boolean hasFocus) {
-                    if (hasFocus)
-                    {
-                        FieldHour d = new FieldHour(vi.getContext(), ((EditText) vi).getText().toString());
-                        d.onOK(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ((EditText) vi).setText((String) v.getTag());
-                            }
-                        });
-                        d.show();
-                    }
-                }
-            });*/
-
                 save.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
                         HashMap<String, String> values = new HashMap<String, String>();
-					
-					/*if (! etName.getText().toString().equalsIgnoreCase(""))
-					{
-						values.put("name", etName.getText().toString());
-						etName.setText("");
-					}
-					if (! etAdress.getText().toString().equalsIgnoreCase(""))
-					{
-						values.put("address", etAdress.getText().toString());
-						etAdress.setText("");
-					}
-					if (! etDescription.getText().toString().equalsIgnoreCase(""))
-					{
-						values.put("description",etDescription.getText().toString());
-						etDescription.setText("");
-					}
-					if (! etHours.getText().toString().equalsIgnoreCase(""))
-					{
-						values.put("opening_hours",etHours.getText().toString());
-						etHours.setText("");
-					}
-					if (! etPhone.getText().toString().equalsIgnoreCase(""))
-					{
-						values.put("phone", etPhone.getText().toString());
-						etPhone.setText("");
-					}
-					if (! etWeb.getText().toString().equalsIgnoreCase(""))
-					{
-						values.put("web", etWeb.getText().toString());
-						etWeb.setText("");
-					}*/
                         mCallback.setValuesOfNewPOI(values);
                         mCallback.hideValues();
                         mCallback.createNewPOI();
