@@ -6,18 +6,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.util.Pair;
+import android.view.View;
 
 public class POIType {
 	HashMap<String,String> heredated;
 	Drawable icon;
 	String name;
-	public POIType(String name,HashMap<String,String> heredated )
-	{
-		this.name=name;
-		this.heredated=heredated;
-		this.icon=null;
+    List<Field> fields;
+	public POIType(String name,HashMap<String,String> heredated ) {
+		this.name = name;
+		this.heredated = heredated;
+		this.icon = null;
+        this.fields = new ArrayList<Field>();
 	}
 	
 	
@@ -27,34 +30,25 @@ public class POIType {
 		this.icon=icon;
 	}
 
+
 	public String getName()
 	{
 		return this.name;
-	}
-	public void setHeredated(HashMap<String,String> heredated)
-	{
-		this.heredated=heredated;
 	}
 	public HashMap<String,String> getHeredated()
 	{
 		return this.heredated;
 	}
-	public Boolean match(HashMap<String,String> tags)
-	{
+	public Boolean match(HashMap<String,String> tags) {
 		Iterator<Entry<String, String>> it=this.heredated.entrySet().iterator();
 		Entry<String,String> element;
-		while (it.hasNext())
-		{
+		while (it.hasNext()) {
 			element=it.next();
-			if (tags.containsKey(element.getKey()))
-			{
-				if( !(tags.get(element.getKey()).equals( this.heredated.get(element.getKey()))))
-				{
+			if (tags.containsKey(element.getKey())) {
+				if( !(tags.get(element.getKey()).equals( this.heredated.get(element.getKey())))){
 					return false;
 				}
-			}
-			else
-			{
+			} else {
 				return false;
 			}
 		}
@@ -69,19 +63,32 @@ public class POIType {
 	{
 		return this.icon;
 	}
-	public List<Pair<String,String>> getListValues()
-	{
+	public List<Pair<String,String>> getListValues() {
 		List<Pair<String,String>> ret=new ArrayList<Pair<String,String>>();
 		Iterator<Entry<String,String>> it=this.heredated.entrySet().iterator();
 		Entry<String,String>element;
-		while (it.hasNext())
-		{
+		while (it.hasNext()) {
 			element=it.next();
 			ret.add(new Pair<String,String>(element.getKey(),element.getValue()));
 		}
 		return ret;
 	}
-	
-	
-	
+    public void addField(Field f) {
+        this.fields.add(f);
+    }
+    public List<View> getView(Activity activity) {
+        List<View> l= new ArrayList<>();
+        for(Field f:this.getFields()) {
+            l.addAll(f.getView(activity));
+        }
+        return l;
+    }
+    public List<Field> getFields()
+    {
+        return this.fields;
+    }
+    public void setFields(List<Field> fields)
+    {
+        this.fields=fields;
+    }
 }

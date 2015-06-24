@@ -1,6 +1,5 @@
 package com.osm.mapbudo;
- 
-//import MainActivitty;
+
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -49,12 +48,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         ImageView imgICon=(ImageView) convertView.findViewById(R.id.imgIcon);
         
         Drawable icon=((MainActivity)this._context).getFilter().getIcon(childText);
-        if (icon!=null)
-        {
+        if (icon!=null) {
         	imgICon.setImageDrawable(icon);
         }
         txtListChild.setText(childText);
-        Log.v("filter", childText+"="+((MainActivity)this._context).getFilter().getStatus(childText).toString());
         txtListChild.setChecked(((MainActivity)this._context).getFilter().getStatus(childText));
         
         Pair <String,Integer> tag=new Pair<String,Integer>(((MainActivity)this._context).getFilter().getGroup(groupPosition),childPosition);
@@ -68,21 +65,16 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 				//1->GroupName
 				//2->ChildPosition
 				Pair<String,Integer> positions=(Pair<String, Integer>) buttonView.getTag();
-				if (((MainActivity) buttonView.getContext()).getModeAddPOI())
-				{
+				if (((MainActivity) buttonView.getContext()).getModeAddPOI()) {
 					cb.setChecked(!cb.isChecked());
 					((MainActivity) buttonView.getContext()).setTypeOfNewPOI(positions.first,positions.second);
 					((MainActivity) buttonView.getContext()).showValues();	
-				}
-				else
-				{
+				} else {
 					((MainActivity) buttonView.getContext()).changeFilter(positions.first,positions.second,cb.isChecked());
 					((MainActivity) buttonView.getContext()).refreshPOIs();
 				}
 				
 				Log.v("test", "uncheck "+String.valueOf(positions.first)+","+String.valueOf(positions.second) );
-				
-				
 			}
 		});
         return convertView;
@@ -91,7 +83,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public int getChildrenCount(int groupPosition) {
     	return ((MainActivity)this._context).getFilter().getNumElements(groupPosition);
-
     }
  
     @Override
@@ -126,8 +117,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public boolean hasStableIds() {
         return false;
     }	
-    
-    
+
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;

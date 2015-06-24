@@ -108,6 +108,7 @@ public class Filter {
 	{
 		return this.groups.get( this.group_names.get(groupIndex)).get(elementIndex);
 	}
+
 	public int getNumGroups() {
 		return this.groups.size();
 	}
@@ -144,47 +145,34 @@ public class Filter {
 		Iterator<Entry<POIType, Boolean>> it=this.filter.entrySet().iterator();
 		Entry<POIType, Boolean> element = null;
 		Boolean stop=false;
-		while((it.hasNext())&&(!stop))
-		{
+		while((it.hasNext())&&(!stop)) {
 			element=it.next();
-			if (element.getKey().getName().equalsIgnoreCase(typename))
-			{
+			if (element.getKey().getName().equalsIgnoreCase(typename)) {
 				stop=true;
 			}
 		}
-		if (stop)
-		{
+		if (stop) {
 			return element.getValue();
-		}
-		else
-		{
+		} else {
 			return null;
 		}
 	}
 	
 	
-	public Drawable getIcon(String typename)
-	{
+	public Drawable getIcon(String typename) {
 		Iterator<Entry<POIType, Drawable>> it=this.icons.entrySet().iterator();
 		Entry<POIType, Drawable> element = null;
 		Boolean stop=false;
-		while((it.hasNext())&&(!stop))
-		{
+		while((it.hasNext())&&(!stop)) {
 			element=it.next();
-			if (element.getKey().getName().equalsIgnoreCase(typename))
-			{
+			if (element.getKey().getName().equalsIgnoreCase(typename)) {
 				stop=true;
 			}
 		}
-		if (stop)
-		{
+		if (stop) {
 			return element.getValue();
-		}
-		else
-		{
+		} else {
 			return null;
 		}
 	}
-
-	
 }

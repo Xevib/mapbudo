@@ -11,9 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.util.Log;
-
-
+import android.widget.GridLayout;
 
 public class ValuesActivity extends ActionBarActivity {
 
@@ -33,7 +31,6 @@ public class ValuesActivity extends ActionBarActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.values, menu);
 		return true;
@@ -65,35 +62,14 @@ public class ValuesActivity extends ActionBarActivity {
 			
 			
 			View rootView = inflater.inflate(R.layout.fragment_values,container, false);
-			//Bundle b=this.getActivity().getIntent().getExtras();
+
+            GridLayout gl = (GridLayout)getView().findViewById(R.id.grid);
 			Button save=(Button) rootView.findViewById(R.id.save);
-			
+
+
 			final Float lat=this.getActivity().getIntent().getExtras().getFloat("_lat");
 			final Float lon=this.getActivity().getIntent().getExtras().getFloat("_lon");
-			
-			final EditText etName=(EditText)rootView.findViewById(R.id.etName);
-			final EditText etAdress=(EditText)rootView.findViewById(R.id.etAdress);
-			final EditText etDescription=(EditText)rootView.findViewById(R.id.etDescription);
-			final EditText etHours=(EditText)rootView.findViewById(R.id.etHours);
-			final EditText etPhone=(EditText)rootView.findViewById(R.id.etPhone);
-			final EditText etWeb=(EditText)rootView.findViewById(R.id.etWeb);
 
-            etHours.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(final View vi, boolean hasFocus) {
-                    if (!hasFocus)
-                    {
-                        DialogHour d = new DialogHour(vi.getContext(), ((EditText) vi).getText().toString());
-                        d.onOK(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ((EditText) vi).setText((String) v.getTag());
-                            }
-                        });
-                        d.show();
-                    }
-                }
-            });
 
 			save.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -101,7 +77,7 @@ public class ValuesActivity extends ActionBarActivity {
 					Intent returnIntent = new Intent();
 					returnIntent.putExtra("_lat",lat);
 					returnIntent.putExtra("_lon",lon);
-					if (! etName.getText().toString().equalsIgnoreCase(""))
+					/*if (! etName.getText().toString().equalsIgnoreCase(""))
 					{
 						returnIntent.putExtra("name",etName.getText().toString());
 					}
@@ -124,7 +100,7 @@ public class ValuesActivity extends ActionBarActivity {
 					if (! etWeb.getText().toString().equalsIgnoreCase(""))
 					{
 						returnIntent.putExtra("web",etWeb.getText().toString());
-					}
+					}*/
 					getActivity().setResult(RESULT_OK,returnIntent);
 					getActivity().finish();
 					

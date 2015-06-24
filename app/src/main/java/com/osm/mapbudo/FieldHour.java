@@ -1,24 +1,15 @@
 package com.osm.mapbudo;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.SearchManager;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.content.Context;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-
 import com.edmodo.rangebar.RangeBar;
 
-import org.apache.http.impl.auth.UnsupportedDigestAlgorithmException;
 
-import javax.security.auth.callback.Callback;
-
-
-public class DialogHour {
+public class FieldHour {
     Dialog dialog;
     Button addOpen;
     Button dialogButtonOK;
@@ -34,106 +25,92 @@ public class DialogHour {
     String value;
 
 
-    public DialogHour(Context c)
-    {
+    public FieldHour(Context c) {
         dialog = new Dialog(c);
         dialog.setContentView(R.layout.dialog_hours);
         dialog.setTitle("Opening hours");
-        addOpen=(Button) dialog.findViewById(R.id.addOpen);
-        txtHours=(TextView) dialog.findViewById(R.id.txtHours);
+        addOpen = (Button) dialog.findViewById(R.id.addOpen);
+        txtHours = (TextView) dialog.findViewById(R.id.txtHours);
 
-        btMonday=(ToggleButton)dialog.findViewById(R.id.btMonday);
-        btTuesday=(ToggleButton)dialog.findViewById(R.id.btTuesday);
-        btWednesday=(ToggleButton)dialog.findViewById(R.id.btWednesday);
-        btThursday=(ToggleButton)dialog.findViewById(R.id.btThursday);
-        btFriday=(ToggleButton)dialog.findViewById(R.id.btFriday);
-        btSaturday=(ToggleButton)dialog.findViewById(R.id.btSaturday);
-        btSunday=(ToggleButton)dialog.findViewById(R.id.btSunday);
-        slRange=(RangeBar)dialog.findViewById(R.id.slRange);
+        btMonday = (ToggleButton) dialog.findViewById(R.id.btMonday);
+        btTuesday = (ToggleButton) dialog.findViewById(R.id.btTuesday);
+        btWednesday = (ToggleButton) dialog.findViewById(R.id.btWednesday);
+        btThursday = (ToggleButton) dialog.findViewById(R.id.btThursday);
+        btFriday = (ToggleButton) dialog.findViewById(R.id.btFriday);
+        btSaturday = (ToggleButton) dialog.findViewById(R.id.btSaturday);
+        btSunday = (ToggleButton) dialog.findViewById(R.id.btSunday);
+        slRange = (RangeBar) dialog.findViewById(R.id.slRange);
 
-        dialogButtonOK=(Button) dialog.findViewById(R.id.dialogButtonOK);
+        dialogButtonOK = (Button) dialog.findViewById(R.id.dialogButtonOK);
         dialogButtonOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();;
+                dialog.dismiss();
+                ;
             }
         });
         dialogButtonOK.setTag("");
         addOpen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String days="";
-                if( btMonday.isChecked())
-                {
-                    days=days+"Mo";
-                    if( days.length()!=0)
-                    {
-                        days=days+"|";
+                String days = "";
+                if (btMonday.isChecked()) {
+                    days = days + "Mo";
+                    if (days.length() != 0) {
+                        days = days + "|";
                     }
                 }
-                if (btTuesday.isChecked())
-                {
-                    days=days+"Tu";
-                    if( days.length()!=0)
-                    {
-                        days=days+"|";
+                if (btTuesday.isChecked()) {
+                    days = days + "Tu";
+                    if (days.length() != 0) {
+                        days = days + "|";
                     }
                 }
-                if(btWednesday.isChecked())
-                {
-                    days=days+"We";
-                    if( days.length()!=0)
-                    {
-                        days=days+"|";
+                if (btWednesday.isChecked()) {
+                    days = days + "We";
+                    if (days.length() != 0) {
+                        days = days + "|";
                     }
                 }
-                if(btThursday.isChecked())
-                {
-                    days=days+"Th";
-                    if( days.length()!=0)
-                    {
-                        days=days+"|";
+                if (btThursday.isChecked()) {
+                    days = days + "Th";
+                    if (days.length() != 0) {
+                        days = days + "|";
                     }
                 }
-                if(btFriday.isChecked())
-                {
-                    days=days+"Fr";
-                    if( days.length()!=0)
-                    {
-                        days=days+"|";
+                if (btFriday.isChecked()) {
+                    days = days + "Fr";
+                    if (days.length() != 0) {
+                        days = days + "|";
                     }
                 }
-                if(btSaturday.isChecked())
-                {
-                    days=days+"Sa";
-                    if( days.length()!=0)
-                    {
-                        days=days+"|";
+                if (btSaturday.isChecked()) {
+                    days = days + "Sa";
+                    if (days.length() != 0) {
+                        days = days + "|";
                     }
                 }
-                if(btSunday.isChecked())
-                {
-                    days=days+"Su";
-                    if( days.length()!=0)
-                    {
-                        days=days+"|";
+                if (btSunday.isChecked()) {
+                    days = days + "Su";
+                    if (days.length() != 0) {
+                        days = days + "|";
                     }
                 }
-                int hr_start=(slRange.getLeftIndex()/30);
-                int min_start=(slRange.getLeftIndex()%30);
+                int hr_start = (slRange.getLeftIndex() / 30);
+                int min_start = (slRange.getLeftIndex() % 30);
 
-                int hr_close=(slRange.getRightIndex()/30);
-                int min_close=(slRange.getRightIndex()%30);
+                int hr_close = (slRange.getRightIndex() / 30);
+                int min_close = (slRange.getRightIndex() % 30);
 
-                txtHours.setText("["+days.substring(0,days.length()-1)+"] "+String.valueOf(hr_start)+":"+String.valueOf(min_start)+"-"+String.valueOf(hr_close)+":"+String.valueOf(min_close));
-                value="["+days.substring(0,days.length()-1)+"] "+String.valueOf(hr_start)+":"+String.valueOf(min_start)+"-"+String.valueOf(hr_close)+":"+String.valueOf(min_close);
+                txtHours.setText("[" + days.substring(0, days.length() - 1) + "] " + String.valueOf(hr_start) + ":" + String.valueOf(min_start) + "-" + String.valueOf(hr_close) + ":" + String.valueOf(min_close));
+                value = "[" + days.substring(0, days.length() - 1) + "] " + String.valueOf(hr_start) + ":" + String.valueOf(min_start) + "-" + String.valueOf(hr_close) + ":" + String.valueOf(min_close);
                 dialogButtonOK.setTag(value);
 
             }
 
         });
     }
-    public DialogHour(Context c, String init_value)
+    public FieldHour(Context c, String init_value)
     {
         this.value=init_value;
         dialog = new Dialog(c);
@@ -164,72 +141,56 @@ public class DialogHour {
             @Override
             public void onClick(View v) {
                 String days="";
-                if( btMonday.isChecked())
-                {
+                if( btMonday.isChecked()){
                     days=days+"Mo";
-                    if( days.length()!=0)
-                    {
+                    if( days.length()!=0) {
                         days=days+"|";
                     }
                 }
-                if (btTuesday.isChecked())
-                {
+                if (btTuesday.isChecked()){
                     days=days+"Tu";
-                    if( days.length()!=0)
-                    {
+                    if( days.length()!=0) {
                         days=days+"|";
                     }
                 }
-                if(btWednesday.isChecked())
-                {
+                if(btWednesday.isChecked()) {
                     days=days+"We";
-                    if( days.length()!=0)
-                    {
+                    if( days.length()!=0) {
                         days=days+"|";
                     }
                 }
-                if(btThursday.isChecked())
-                {
+                if(btThursday.isChecked()) {
                     days=days+"Th";
-                    if( days.length()!=0)
-                    {
+                    if( days.length()!=0) {
                         days=days+"|";
                     }
                 }
-                if(btFriday.isChecked())
-                {
+                if(btFriday.isChecked()) {
                     days=days+"Fr";
-                    if( days.length()!=0)
-                    {
+                    if( days.length()!=0) {
                         days=days+"|";
                     }
                 }
-                if(btSaturday.isChecked())
-                {
+                if(btSaturday.isChecked()) {
                     days=days+"Sa";
-                    if( days.length()!=0)
-                    {
+                    if( days.length()!=0) {
                         days=days+"|";
                     }
                 }
-                if(btSunday.isChecked())
-                {
+                if(btSunday.isChecked()) {
                     days=days+"Su";
-                    if( days.length()!=0)
-                    {
+                    if( days.length()!=0) {
                         days=days+"|";
                     }
                 }
                 int hr_start=(slRange.getLeftIndex()/30);
                 int min_start=(slRange.getLeftIndex()%30);
-
                 int hr_close=(slRange.getRightIndex()/30);
                 int min_close=(slRange.getRightIndex()%30);
 
                 txtHours.setText("["+days.substring(0,days.length()-1)+"] "+String.valueOf(hr_start)+":"+String.valueOf(min_start)+"-"+String.valueOf(hr_close)+":"+String.valueOf(min_close));
                 value="["+days.substring(0,days.length()-1)+"] "+String.valueOf(hr_start)+":"+String.valueOf(min_start)+"-"+String.valueOf(hr_close)+":"+String.valueOf(min_close);
                 dialogButtonOK.setTag(value);
-
             }
 
         });

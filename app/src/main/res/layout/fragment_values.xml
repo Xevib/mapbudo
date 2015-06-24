@@ -10,9 +10,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="#ffffff"
     android:layout_gravity="bottom"
+    android:id="@+id/grid"
     >
 
-    <TextView
+<!--    <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -107,6 +108,7 @@
         android:layout_weight="1"
         app:layout_gravity="fill_horizontal"
         android:ems="10" />
+    -->
 
     <Button
         android:id="@+id/save"
@@ -114,6 +116,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_gravity="left"
-        android:text="@string/save" />
+        android:text="@string/save"
+        android:layout_columnWeight="1" />
 
 </android.support.v7.widget.GridLayout>
