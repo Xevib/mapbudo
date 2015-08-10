@@ -7,6 +7,7 @@ package com.osm.mapbudo;
 //TODO Etiquetes com «Opening_hours» haurien de disposar d'algun tipus d'ajuda. Un desplegable amb exemples o quelcom similar. Jo no tinc pebrots d'emplenar aquesta etiqueta sense una xuleta.
 //TODO Per etiquetes amb molts valors (com «Services» o «Shoping») estaria molt bé plegar la categoria des del darrer valor de la categoria, ja que si no t'obliga a fer scroll fins a dalt de tot per poder tancar-la.
 import java.lang.reflect.Array;
+import java.lang.reflect.MalformedParameterizedTypeException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,6 +28,10 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Bitmap;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -42,7 +47,6 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -57,7 +61,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 import android.support.v4.view.GravityCompat;
 
-public class MainActivity extends ActionBarActivity implements MapEventsReceiver,OnMarkerDragListener {
+public class MainActivity extends ActionBarActivity implements MapbudoEventsReceiver,OnMarkerDragListener {
 	private DrawerLayout drawerlayout;
 	private ActionBarDrawerToggle drawertoggle;
 	private ExpandableListView drawerlist;
@@ -72,7 +76,9 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	private double lastlat;
 	private double lastlon;
 	private int lastzoom;
-	
+
+    private Marker poi_preview;
+    private Boolean poi_preview_added;
 	private Boolean mode_add_poi;
 	private Filter filt;
 	private Marker selected_marker;
@@ -85,10 +91,11 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		this.values_visible=false;
-		this.active_get=false;
-        this.mode_add_poi=false;
+
+        poi_preview_added = false;
+		this.values_visible = false;
+		this.active_get = false;
+        this.mode_add_poi = false;
 
 		menu=null;
 		locationmanager = (LocationManager)this.getApplicationContext().getSystemService(LOCATION_SERVICE);
@@ -277,85 +284,64 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-					View rootView = inflater.inflate(R.layout.fragment_main, container,false);
-					MapView map=(MapView)rootView.findViewById(R.id.mapview);
-					MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(rootView.getContext(), (MapEventsReceiver) getActivity() );
-					rRefresh=new Runnable(){
-				        public void run() {
-				        	((MainActivity)getActivity()).refreshPOIs();
-				      }};
+            View rootView = inflater.inflate(R.layout.fragment_main, container,false);
+            MapView map=(MapView)rootView.findViewById(R.id.mapview);
+           // MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(rootView.getContext(), (MapbudoEventsReceiver) getActivity() );
+            EventOverlay eventOverlay= new EventOverlay(rootView.getContext(), (MapbudoEventsReceiver) getActivity());
+                    //MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(rootView.getContext(), (MapEventsReceiver) getActivity() );
+            rRefresh=new Runnable(){
+                public void run() {
+                    ((MainActivity)getActivity()).refreshPOIs();
+                }};
+	            map.setMapListener(new MapListener() {
+                    private long lastScroll = 0;
 
-					map.setMapListener(new MapListener() {
-						
-						
-						private long lastScroll=0;
+                    @Override
+                    public boolean onZoom(ZoomEvent event) {
+                        Integer lastzoom = ((MainActivity) getActivity()).getLastZoom();
+                        if (event.getZoomLevel() < lastzoom) {
+                            ((MainActivity) getActivity()).refreshPOIs();
+                        }
+                        ((MainActivity) getActivity()).setLastZoom(event.getZoomLevel());
+                        return false;
+                    }
 
-						@Override
-						public boolean onZoom(ZoomEvent event) {
-							Integer lastzoom=((MainActivity)getActivity()).getLastZoom();
-							//Detect zoom out
-							if (event.getZoomLevel()<lastzoom)
-							{
-								((MainActivity)getActivity()).refreshPOIs();
-							}
-							((MainActivity)getActivity()).setLastZoom(event.getZoomLevel());
-							
-							return false;
-						}
-						
-						@Override
-						public boolean onScroll(ScrollEvent event) {
-							MapView map=(MapView) getActivity().findViewById(R.id.mapview);
-							if (map!=null)
-							{
-									if (  ( Math.abs(((MainActivity)getActivity()).getLastLat()-((event.getX()/1E6))) >(2/1E6))  ||( Math.abs(((MainActivity)getActivity()).getLastLon()-((event.getY()/1E6)))>(2/1E6)))
-									{
-										((MainActivity)getActivity()).setMainMenu();
-										((MainActivity)getActivity()).unfollow();
-										
-										if (handlerTimer==null)
-										{
-											handlerTimer=new Handler();
-										}
-										if ((this.lastScroll+300)<System.currentTimeMillis())
-										{
-											handlerTimer.postDelayed(rRefresh, 300);
-										}
-										else
-										{
-											handlerTimer.removeCallbacks(rRefresh);
-											handlerTimer.postDelayed(rRefresh, 300);
-										}
-										this.lastScroll=System.currentTimeMillis();
-										((MainActivity)getActivity()).setLastLat(event.getX()/1E6);
-										((MainActivity)getActivity()).setLastLon(event.getY()/1E6);
-										
-									}
-							}
-							return false;
-						}
+                    @Override
+                    public boolean onScroll(ScrollEvent event) {
+                        MapView map = (MapView) getActivity().findViewById(R.id.mapview);
+                        if (map != null) {
+                            if ((Math.abs(((MainActivity) getActivity()).getLastLat() - ((event.getX() / 1E6))) > (2 / 1E6)) || (Math.abs(((MainActivity) getActivity()).getLastLon() - ((event.getY() / 1E6))) > (2 / 1E6))) {
+                                ((MainActivity) getActivity()).setMainMenu();
+                                ((MainActivity) getActivity()).unfollow();
+                                if (handlerTimer == null) {
+                                    handlerTimer = new Handler();
+                                }
+                                if ((this.lastScroll + 300) < System.currentTimeMillis()) {
+                                    handlerTimer.postDelayed(rRefresh, 300);
+                                } else {
+                                    handlerTimer.removeCallbacks(rRefresh);
+                                    handlerTimer.postDelayed(rRefresh, 300);
+                                }
+                                this.lastScroll = System.currentTimeMillis();
+                                ((MainActivity) getActivity()).setLastLat(event.getX() / 1E6);
+                                ((MainActivity) getActivity()).setLastLon(event.getY() / 1E6);
+                            }
+                        }
+                        return false;
+                    }
+                });
+            MapController mapController = (MapController) map.getController();
+            map.setMaxZoomLevel(19);
+            mapController.setZoom(((MainActivity) this.getActivity()).getLastZoom());
 
-						
-					});
-					MapController mapController = (MapController) map.getController();
-					map.setMaxZoomLevel(19);
-			        mapController.setZoom(((MainActivity)this.getActivity()).getLastZoom());
-					
-			        map.setMultiTouchControls(true);
-			        map.setBuiltInZoomControls(true);
-			        //ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
-			        map.getOverlays().add(mapEventsOverlay);
+            map.setMultiTouchControls(true);
+            map.setBuiltInZoomControls(true);
 
-				return rootView;
+            map.getOverlays().add(eventOverlay);
+            return rootView;
 		}
 	}
 	
-	@Override
-	public boolean singleTapConfirmedHelper(GeoPoint p) {
-		
-		
-		return false;
-	}
 
 	public void load_state() {
 		SharedPreferences preferences = getSharedPreferences("com.osm.mapbudo", Context.MODE_PRIVATE);
@@ -436,6 +422,48 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
             map.getOverlays().remove(1);
         }
         map.getOverlays();
+        map.invalidate();
+    }
+    protected Drawable scaleImage (Drawable image, float scaleFactor) {
+
+        if ((image == null) || !(image instanceof BitmapDrawable)) {
+            return image;
+        }
+
+        Bitmap b = ((BitmapDrawable)image).getBitmap();
+
+        int sizeX = Math.round(image.getIntrinsicWidth() * scaleFactor);
+        int sizeY = Math.round(image.getIntrinsicHeight() * scaleFactor);
+
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, sizeX, sizeY, false);
+
+        image = new BitmapDrawable(getResources(), bitmapResized);
+
+        return image;
+
+    }
+    protected void addPOIPreview(GeoPoint p)
+    {
+        MapView map = (MapView) this.findViewById(R.id.mapview);
+        if (! poi_preview_added) {
+            poi_preview = new Marker(map);
+            poi_preview.setPosition(p);
+            poi_preview.setIcon(scaleImage(this.getResources().getDrawable(R.drawable.marker),1.2f));
+            map.getOverlays().add(poi_preview);
+            poi_preview_added=true;
+
+        }
+        else
+        {
+            poi_preview.setPosition(p);
+        }
+        map.invalidate();
+    }
+    protected void removePOIPreview()
+    {
+        MapView map=(MapView)this.findViewById(R.id.mapview);
+        map.getOverlays().remove(poi_preview);
+        poi_preview_added=false;
         map.invalidate();
     }
 	protected void addPOI(POI p)
@@ -525,14 +553,23 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 			getMenuInflater().inflate(R.menu.main, menu);
 		}
 	}
+    @Override
+    public boolean onLongPressDown(GeoPoint p)
+    {
+        this.addPOIPreview(p);
+        return false;
+    }
 
-	@Override
-	public boolean longPressHelper(GeoPoint p) {
-		this.setModeAddPOI(true);
-		drawerlayout.openDrawer(Gravity.START);
-		this.setLatLonOfNewPOI(p.getLatitude(), p.getLongitude());
-		return false;
-	}
+    @Override
+    public boolean onLongPressRelease(GeoPoint p)
+    {
+        this.removePOIPreview();
+        this.setModeAddPOI(true);
+        drawerlayout.openDrawer(Gravity.START);
+        this.setLatLonOfNewPOI(p.getLatitude(), p.getLongitude());
+        return false;
+    }
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -751,6 +788,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	        	return true;
 	        }
             else if (drawerlayout.isDrawerOpen(GravityCompat.START)) {
+                this.removePOIPreview();
                 drawerlayout.closeDrawer(Gravity.LEFT);
 				this.setModeAddPOI(false);
                 return false;
