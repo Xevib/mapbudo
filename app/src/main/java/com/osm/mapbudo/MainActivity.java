@@ -278,7 +278,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 					View rootView = inflater.inflate(R.layout.fragment_main, container,false);
-					MapView map=(MapView)rootView.findViewById(R.id.mapview);	
+					MapView map=(MapView)rootView.findViewById(R.id.mapview);
 					MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(rootView.getContext(), (MapEventsReceiver) getActivity() );
 					rRefresh=new Runnable(){
 				        public void run() {
@@ -752,6 +752,7 @@ public class MainActivity extends ActionBarActivity implements MapEventsReceiver
 	        }
             else if (drawerlayout.isDrawerOpen(GravityCompat.START)) {
                 drawerlayout.closeDrawer(Gravity.LEFT);
+				this.setModeAddPOI(false);
                 return false;
             }
 	    }
